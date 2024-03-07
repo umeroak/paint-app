@@ -87,7 +87,6 @@ public class DrawingPanel extends JPanel {
     }
 
     public void redo() {
-        // Not implemented for this example
     }
 
     public void setCurrentColor(Color color) {
