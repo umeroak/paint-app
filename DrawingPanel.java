@@ -1,9 +1,6 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
+import java.awt.event.*;
 
 public class DrawingPanel extends JPanel {
     private List<List<Point>> scribbleLines = new ArrayList<>();
@@ -19,12 +18,36 @@ public class DrawingPanel extends JPanel {
     private float currentStrokeWidth = 2.0f; // Default stroke width
     private Map<List<Point>, Color> lineColors = new HashMap<>();
     private BufferedImage backgroundImage; // Variable to hold loaded image
+    private Stack<List<Point>> undoneLines = new Stack<>(); // Stack to store undone lines
 
     public DrawingPanel() {
         setBackground(Color.WHITE);
         setPreferredSize(new Dimension(800, 600)); // Set default size
         addMouseListener(new DrawingMouseListener());
         addMouseMotionListener(new DrawingMouseMotionListener());
+        registerKeyboardShortcuts();
+    }
+
+    private void registerKeyboardShortcuts() {
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+            KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()), "undoAction");
+
+        getActionMap().put("undoAction", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                undo();
+            }
+        });
+
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+            KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()), "redoAction");
+
+        getActionMap().put("redoAction", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                redo();
+            }
+        });
     }
 
     @Override
@@ -79,14 +102,21 @@ public class DrawingPanel extends JPanel {
         repaint();
     }
 
+
     public void undo() {
         if (!scribbleLines.isEmpty()) {
-            scribbleLines.remove(scribbleLines.size() - 1);
+            List<Point> removedLine = scribbleLines.remove(scribbleLines.size() - 1);
+            undoneLines.push(removedLine);
             repaint();
         }
     }
 
     public void redo() {
+        if (!undoneLines.isEmpty()) {
+            List<Point> restoredLine = undoneLines.pop();
+            scribbleLines.add(restoredLine);
+            repaint();
+        }
     }
 
     public void setCurrentColor(Color color) {
@@ -109,6 +139,7 @@ public class DrawingPanel extends JPanel {
             scribbleLines.add(new ArrayList<>(currentLine));
             lineColors.put(new ArrayList<>(currentLine), currentColor);
             currentLine.clear();
+            undoneLines.clear(); // Clear undone actions when a new action is performed
             repaint();
         }
     }
