@@ -1,12 +1,9 @@
-
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 
 public class MainFrame extends JFrame {
     private DrawingPanel drawingPanel;
@@ -27,9 +24,9 @@ public class MainFrame extends JFrame {
 
     private void createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-    
+
         JMenu fileMenu = new JMenu("File");
-         JMenuItem openMenuItem = new JMenuItem("Open");
+        JMenuItem openMenuItem = new JMenuItem("Open");
         openMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -54,24 +51,11 @@ public class MainFrame extends JFrame {
         saveMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Save Image File");
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Images", "png");
-                fileChooser.setFileFilter(filter);
-                int option = fileChooser.showSaveDialog(MainFrame.this);
-                if (option == JFileChooser.APPROVE_OPTION) {
-                    File file = fileChooser.getSelectedFile();
-                try {
-                    drawingPanel.saveImage(file);
-                    JOptionPane.showMessageDialog(MainFrame.this, "Image saved successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(MainFrame.this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
+                // Implement save functionality
             }
-        }
-    });
-    fileMenu.add(saveMenuItem);
-    
+        });
+        fileMenu.add(saveMenuItem);
+
         JMenuItem quitMenuItem = new JMenuItem("Quit");
         quitMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -80,7 +64,8 @@ public class MainFrame extends JFrame {
             }
         });
         fileMenu.add(quitMenuItem);
-    
+
+
         JMenu editMenu = new JMenu("Edit");
         JMenuItem undoMenuItem = new JMenuItem("Undo");
         undoMenuItem.addActionListener(new ActionListener() {
@@ -99,7 +84,8 @@ public class MainFrame extends JFrame {
             }
         });
         editMenu.add(redoMenuItem);
-    
+
+
         JMenu colorMenu = new JMenu("Color");
         JMenuItem colorMenuItem = new JMenuItem("Choose Color");
         colorMenuItem.addActionListener(new ActionListener() {
@@ -112,14 +98,36 @@ public class MainFrame extends JFrame {
             }
         });
         colorMenu.add(colorMenuItem);
-    
+
+
+        JMenu shapeMenu = new JMenu("Shape");
+        JMenuItem rectangleMenuItem = new JMenuItem("Rectangle");
+        rectangleMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.RECTANGLE);
+            }
+        });
+        shapeMenu.add(rectangleMenuItem);
+
+        JMenuItem ovalMenuItem = new JMenuItem("Oval");
+        ovalMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.OVAL);
+            }
+        });
+        shapeMenu.add(ovalMenuItem);
+
+        // Add more shape options as needed...
+
         menuBar.add(fileMenu);
-        menuBar.add(editMenu);
+        menuBar.add(shapeMenu);
         menuBar.add(colorMenu);
-    
+        menuBar.add(editMenu);
+
         setJMenuBar(menuBar);
     }
-    
 
     public static void main(String[] args) {
         new MainFrame();

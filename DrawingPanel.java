@@ -1,6 +1,9 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -8,8 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
-import java.awt.event.*;
 
 public class DrawingPanel extends JPanel {
     private List<List<Point>> scribbleLines = new ArrayList<>();
@@ -18,36 +19,14 @@ public class DrawingPanel extends JPanel {
     private float currentStrokeWidth = 2.0f; // Default stroke width
     private Map<List<Point>, Color> lineColors = new HashMap<>();
     private BufferedImage backgroundImage; // Variable to hold loaded image
-    private Stack<List<Point>> undoneLines = new Stack<>(); // Stack to store undone lines
+    private List<Shape> shapes = new ArrayList<>();
+    private Shape currentShape;
 
     public DrawingPanel() {
         setBackground(Color.WHITE);
         setPreferredSize(new Dimension(800, 600)); // Set default size
         addMouseListener(new DrawingMouseListener());
         addMouseMotionListener(new DrawingMouseMotionListener());
-        registerKeyboardShortcuts();
-    }
-
-    private void registerKeyboardShortcuts() {
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-            KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()), "undoAction");
-
-        getActionMap().put("undoAction", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                undo();
-            }
-        });
-
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-            KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()), "redoAction");
-
-        getActionMap().put("redoAction", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                redo();
-            }
-        });
     }
 
     @Override
@@ -65,7 +44,7 @@ public class DrawingPanel extends JPanel {
         // Draw existing lines
         for (List<Point> line : scribbleLines) {
             if (line.size() > 1) {
-                g2d.setColor(lineColors.get(line));
+                g2d.setColor(currentColor);
                 Point prevPoint = line.get(0);
                 for (int i = 1; i < line.size(); i++) {
                     Point currentPoint = line.get(i);
@@ -86,6 +65,15 @@ public class DrawingPanel extends JPanel {
             }
         }
 
+        for (Shape shape : shapes) {
+            drawShape(g2d, shape);
+        }
+
+        // Draw current shape if any...
+        if (currentShape != null) {
+            drawShape(g2d, currentShape);
+        }
+
         g2d.dispose();
     }
 
@@ -102,21 +90,14 @@ public class DrawingPanel extends JPanel {
         repaint();
     }
 
-
     public void undo() {
         if (!scribbleLines.isEmpty()) {
-            List<Point> removedLine = scribbleLines.remove(scribbleLines.size() - 1);
-            undoneLines.push(removedLine);
+            scribbleLines.remove(scribbleLines.size() - 1);
             repaint();
         }
     }
 
     public void redo() {
-        if (!undoneLines.isEmpty()) {
-            List<Point> restoredLine = undoneLines.pop();
-            scribbleLines.add(restoredLine);
-            repaint();
-        }
     }
 
     public void setCurrentColor(Color color) {
@@ -127,28 +108,75 @@ public class DrawingPanel extends JPanel {
         this.currentStrokeWidth = width;
     }
 
+    private void drawShape(Graphics2D g2d, Shape shape) {
+        g2d.setColor(shape.getColor());
+        g2d.setStroke(shape.getStroke());
+
+        int x1 = shape.getX1();
+        int y1 = shape.getY1();
+        int x2 = shape.getX2();
+        int y2 = shape.getY2();
+
+        switch (shape.getShape()) {
+            case Shape.RECTANGLE:
+                g2d.drawRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
+                break;
+            case Shape.OVAL:
+                g2d.drawOval(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
+                break;
+            // Add more shape types if needed...
+        }
+    }
+
+    public void setCurrentShape(int shapeType) {
+        currentShape = new Shape(0, 0, 0, 0, Color.BLACK, new BasicStroke(2.0f), shapeType);
+        repaint();
+    }
+
     private class DrawingMouseListener extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
-            currentLine.clear();
-            currentLine.add(e.getPoint());
+            if (currentShape != null) {
+                int x = e.getX();
+                int y = e.getY();
+                currentShape = new Shape(x, y, x, y, currentColor, new BasicStroke(currentStrokeWidth), currentShape.getShape());
+            } else {
+                currentLine.clear();
+                currentLine.add(e.getPoint());
+            }
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            scribbleLines.add(new ArrayList<>(currentLine));
-            lineColors.put(new ArrayList<>(currentLine), currentColor);
-            currentLine.clear();
-            undoneLines.clear(); // Clear undone actions when a new action is performed
-            repaint();
+            if (currentShape != null) {
+                int x = e.getX();
+                int y = e.getY();
+                currentShape.setX2(x);
+                currentShape.setY2(y);
+                shapes.add(currentShape);
+                currentShape = null;
+                repaint();
+            } else {
+                scribbleLines.add(new ArrayList<>(currentLine));
+                currentLine.clear();
+                repaint();
+            }
         }
     }
 
     private class DrawingMouseMotionListener extends MouseMotionAdapter {
         @Override
         public void mouseDragged(MouseEvent e) {
-            currentLine.add(e.getPoint());
-            repaint();
+            if (currentShape != null) {
+                int x = e.getX();
+                int y = e.getY();
+                currentShape.setX2(x);
+                currentShape.setY2(y);
+                repaint();
+            } else {
+                currentLine.add(e.getPoint());
+                repaint();
+            }
         }
     }
 }
