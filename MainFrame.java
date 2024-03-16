@@ -75,6 +75,26 @@ public class MainFrame extends JFrame {
             }
         });
         editMenu.add(undoMenuItem);
+
+        JMenu zoomMenu = new JMenu("Zoom");
+        JMenuItem zoomInMenuItem = new JMenuItem("Zoom In");
+        zoomInMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.zoomIn();
+            }
+        });
+        zoomMenu.add(zoomInMenuItem);
+        
+        JMenuItem zoomOutMenuItem = new JMenuItem("Zoom Out");
+        zoomOutMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.zoomOut();
+            }
+        });
+        zoomMenu.add(zoomOutMenuItem);
+        
     
         JMenuItem redoMenuItem = new JMenuItem("Redo");
         redoMenuItem.addActionListener(new ActionListener() {
@@ -125,7 +145,7 @@ public class MainFrame extends JFrame {
         menuBar.add(shapeMenu);
         menuBar.add(colorMenu);
         menuBar.add(editMenu);
-
+        menuBar.add(zoomMenu); // Add the zoom menu to the menu bar
         setJMenuBar(menuBar);
     }
 

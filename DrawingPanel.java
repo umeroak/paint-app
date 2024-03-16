@@ -21,6 +21,8 @@ public class DrawingPanel extends JPanel {
     private BufferedImage backgroundImage; // Variable to hold loaded image
     private List<Shape> shapes = new ArrayList<>();
     private Shape currentShape;
+    private List<List<Point>> undoneLines = new ArrayList<>(); // List to store undone lines
+    private double scaleFactor = 1.0; // Scale factor for zooming
 
     public DrawingPanel() {
         setBackground(Color.WHITE);
@@ -35,6 +37,9 @@ public class DrawingPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setStroke(new BasicStroke(currentStrokeWidth)); // Set current stroke width
+
+        // Apply zoom
+        g2d.scale(scaleFactor, scaleFactor);
 
         // Draw background image if available
         if (backgroundImage != null) {
@@ -92,12 +97,16 @@ public class DrawingPanel extends JPanel {
 
     public void undo() {
         if (!scribbleLines.isEmpty()) {
-            scribbleLines.remove(scribbleLines.size() - 1);
+            undoneLines.add(scribbleLines.remove(scribbleLines.size() - 1)); // Move the undone line to undoneLines
             repaint();
         }
     }
 
     public void redo() {
+        if (!undoneLines.isEmpty()) {
+            scribbleLines.add(undoneLines.remove(undoneLines.size() - 1)); // Move the undone line back to scribbleLines
+            repaint();
+        }
     }
 
     public void setCurrentColor(Color color) {
@@ -178,5 +187,15 @@ public class DrawingPanel extends JPanel {
                 repaint();
             }
         }
+    }
+
+    public void zoomIn() {
+        scaleFactor *= 1.1; // Increase scale factor for zooming in
+        repaint();
+    }
+
+    public void zoomOut() {
+        scaleFactor /= 1.1; // Decrease scale factor for zooming out
+        repaint();
     }
 }
