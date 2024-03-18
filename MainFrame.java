@@ -88,14 +88,6 @@ public class MainFrame extends JFrame {
             }
         });
         editMenu.add(undoMenuItem);
-        JMenuItem eraserMenuItem = new JMenuItem("Eraser");
-        eraserMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setEraserMode(!drawingPanel.isEraserMode()); // Toggle eraser mode
-            }
-        });
-        editMenu.add(eraserMenuItem);
 
         JMenu zoomMenu = new JMenu("Zoom");
         JMenuItem zoomInMenuItem = new JMenuItem("Zoom In");
