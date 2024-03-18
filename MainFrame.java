@@ -51,10 +51,23 @@ public class MainFrame extends JFrame {
         saveMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Implement save functionality
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Save Image File");
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Images", "png");
+                fileChooser.setFileFilter(filter);
+                int option = fileChooser.showSaveDialog(MainFrame.this);
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    try {
+                        drawingPanel.saveImage(file);
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(MainFrame.this, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             }
         });
         fileMenu.add(saveMenuItem);
+
 
         JMenuItem quitMenuItem = new JMenuItem("Quit");
         quitMenuItem.addActionListener(new ActionListener() {
@@ -75,6 +88,14 @@ public class MainFrame extends JFrame {
             }
         });
         editMenu.add(undoMenuItem);
+        JMenuItem eraserMenuItem = new JMenuItem("Eraser");
+        eraserMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setEraserMode(!drawingPanel.isEraserMode()); // Toggle eraser mode
+            }
+        });
+        editMenu.add(eraserMenuItem);
 
         JMenu zoomMenu = new JMenu("Zoom");
         JMenuItem zoomInMenuItem = new JMenuItem("Zoom In");

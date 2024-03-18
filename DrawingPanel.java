@@ -23,12 +23,18 @@ public class DrawingPanel extends JPanel {
     private Shape currentShape;
     private List<List<Point>> undoneLines = new ArrayList<>(); // List to store undone lines
     private double scaleFactor = 1.0; // Scale factor for zooming
+    private boolean isErasing = false; // Flag to indicate eraser mode
+    private int eraserSize = 10;
 
     public DrawingPanel() {
         setBackground(Color.WHITE);
+        setFocusable(true);
+        requestFocusInWindow();
         setPreferredSize(new Dimension(800, 600)); // Set default size
         addMouseListener(new DrawingMouseListener());
         addMouseMotionListener(new DrawingMouseMotionListener());
+
+        new KeyboardHandler(this);
     }
 
     @Override
@@ -49,7 +55,8 @@ public class DrawingPanel extends JPanel {
         // Draw existing lines
         for (List<Point> line : scribbleLines) {
             if (line.size() > 1) {
-                g2d.setColor(currentColor);
+                Color color = lineColors.get(line); // Retrieve color for the line
+                g2d.setColor(color);
                 Point prevPoint = line.get(0);
                 for (int i = 1; i < line.size(); i++) {
                     Point currentPoint = line.get(i);
@@ -78,6 +85,7 @@ public class DrawingPanel extends JPanel {
         if (currentShape != null) {
             drawShape(g2d, currentShape);
         }
+        
 
         g2d.dispose();
     }
@@ -154,7 +162,7 @@ public class DrawingPanel extends JPanel {
                 currentLine.add(e.getPoint());
             }
         }
-
+    
         @Override
         public void mouseReleased(MouseEvent e) {
             if (currentShape != null) {
@@ -166,13 +174,15 @@ public class DrawingPanel extends JPanel {
                 currentShape = null;
                 repaint();
             } else {
-                scribbleLines.add(new ArrayList<>(currentLine));
+                List<Point> newLine = new ArrayList<>(currentLine);
+                scribbleLines.add(newLine);
+                lineColors.put(newLine, currentColor); // Store color for the line
                 currentLine.clear();
                 repaint();
             }
         }
     }
-
+    
     private class DrawingMouseMotionListener extends MouseMotionAdapter {
         @Override
         public void mouseDragged(MouseEvent e) {
@@ -188,6 +198,7 @@ public class DrawingPanel extends JPanel {
             }
         }
     }
+    
 
     public void zoomIn() {
         scaleFactor *= 1.1; // Increase scale factor for zooming in
