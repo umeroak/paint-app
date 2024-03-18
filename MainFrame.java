@@ -16,6 +16,8 @@ public class MainFrame extends JFrame {
 
         drawingPanel = new DrawingPanel();
         getContentPane().add(drawingPanel);
+        new KeyboardHandler(drawingPanel);
+
 
         createMenuBar();
 

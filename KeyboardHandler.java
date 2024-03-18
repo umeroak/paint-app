@@ -1,9 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
-@SuppressWarnings("deprecation")
 public class KeyboardHandler {
     private DrawingPanel drawingPanel;
 
@@ -13,32 +11,28 @@ public class KeyboardHandler {
     }
 
     private void registerKeyboardShortcuts() {
-        Action undoAction = new AbstractAction("Undo") {
+        InputMap inputMap = drawingPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = drawingPanel.getActionMap();
+
+        // Undo shortcut
+        KeyStroke undoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
+        inputMap.put(undoKeyStroke, "undoAction");
+        actionMap.put("undoAction", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 drawingPanel.undo();
             }
-        };
+        });
 
-        Action redoAction = new AbstractAction("Redo") {
+        // Redo shortcut
+        KeyStroke redoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
+        inputMap.put(redoKeyStroke, "redoAction");
+        actionMap.put("redoAction", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 drawingPanel.redo();
             }
-        };
-
-        InputMap inputMap = drawingPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        ActionMap actionMap = drawingPanel.getActionMap();
-
-        // Define keyboard shortcuts
-        KeyStroke undoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-        KeyStroke redoKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-
-        // Register shortcuts with actions
-        inputMap.put(undoKeyStroke, "undoAction");
-        actionMap.put("undoAction", undoAction);
-
-        inputMap.put(redoKeyStroke, "redoAction");
-        actionMap.put("redoAction", redoAction);
+        });
     }
 }
+

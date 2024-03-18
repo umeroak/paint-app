@@ -21,20 +21,19 @@ public class DrawingPanel extends JPanel {
     private BufferedImage backgroundImage; // Variable to hold loaded image
     private List<Shape> shapes = new ArrayList<>();
     private Shape currentShape;
+    private int toolbarsize = 200;
     private List<List<Point>> undoneLines = new ArrayList<>(); // List to store undone lines
+    
     private double scaleFactor = 1.0; // Scale factor for zooming
-    private boolean isErasing = false; // Flag to indicate eraser mode
-    private int eraserSize = 10;
+    private List<Shape> undoShapes = new ArrayList<>();
+    private List<String> undoList = new ArrayList<>();
+    private List<String> redoList = new ArrayList<>();
 
     public DrawingPanel() {
         setBackground(Color.WHITE);
-        setFocusable(true);
-        requestFocusInWindow();
         setPreferredSize(new Dimension(800, 600)); // Set default size
         addMouseListener(new DrawingMouseListener());
         addMouseMotionListener(new DrawingMouseMotionListener());
-
-        new KeyboardHandler(this);
     }
 
     @Override
@@ -55,8 +54,7 @@ public class DrawingPanel extends JPanel {
         // Draw existing lines
         for (List<Point> line : scribbleLines) {
             if (line.size() > 1) {
-                Color color = lineColors.get(line); // Retrieve color for the line
-                g2d.setColor(color);
+                g2d.setColor(currentColor);
                 Point prevPoint = line.get(0);
                 for (int i = 1; i < line.size(); i++) {
                     Point currentPoint = line.get(i);
@@ -85,7 +83,6 @@ public class DrawingPanel extends JPanel {
         if (currentShape != null) {
             drawShape(g2d, currentShape);
         }
-        
 
         g2d.dispose();
     }
@@ -97,23 +94,55 @@ public class DrawingPanel extends JPanel {
         g2d.dispose();
         ImageIO.write(image, "PNG", file);
     }
-
     public void openImage(File file) throws IOException {
         backgroundImage = ImageIO.read(file);
         repaint();
     }
+    
 
     public void undo() {
-        if (!scribbleLines.isEmpty()) {
-            undoneLines.add(scribbleLines.remove(scribbleLines.size() - 1)); // Move the undone line to undoneLines
-            repaint();
+        
+        if(!undoList.isEmpty())
+        {
+            if(undoList.get(undoList.size()-1)=="Pen")
+            {
+                if (!scribbleLines.isEmpty()) {
+                    undoneLines.add(scribbleLines.remove(scribbleLines.size() - 1)); // Move the undone line to undoneLines
+                    repaint();
+                }
+            }
+            else
+            {
+                if(!shapes.isEmpty())
+                {
+                    undoShapes.add(shapes.remove(shapes.size()-1));
+                    repaint();
+                }
+            }
+            redoList.add(undoList.remove(undoList.size()-1));
         }
     }
 
     public void redo() {
-        if (!undoneLines.isEmpty()) {
-            scribbleLines.add(undoneLines.remove(undoneLines.size() - 1)); // Move the undone line back to scribbleLines
-            repaint();
+        
+        if(!redoList.isEmpty())
+        {
+            if(redoList.get(redoList.size()-1)=="Pen")
+            {
+                if (!undoneLines.isEmpty()) {
+                    scribbleLines.add(undoneLines.remove(undoneLines.size() - 1)); // Move the undone line back to scribbleLines
+                    repaint();
+                }
+            }
+            else
+            {
+                if(!undoShapes.isEmpty())
+                {
+                    shapes.add(undoShapes.remove(undoShapes.size()-1));
+                    repaint();
+                }
+            }
+            undoList.add(redoList.remove(redoList.size()-1));
         }
     }
 
@@ -157,12 +186,14 @@ public class DrawingPanel extends JPanel {
                 int x = e.getX();
                 int y = e.getY();
                 currentShape = new Shape(x, y, x, y, currentColor, new BasicStroke(currentStrokeWidth), currentShape.getShape());
+                undoList.add("Shape");
             } else {
+                undoList.add("Pen");
                 currentLine.clear();
                 currentLine.add(e.getPoint());
             }
         }
-    
+
         @Override
         public void mouseReleased(MouseEvent e) {
             if (currentShape != null) {
@@ -174,15 +205,13 @@ public class DrawingPanel extends JPanel {
                 currentShape = null;
                 repaint();
             } else {
-                List<Point> newLine = new ArrayList<>(currentLine);
-                scribbleLines.add(newLine);
-                lineColors.put(newLine, currentColor); // Store color for the line
+                scribbleLines.add(new ArrayList<>(currentLine));
                 currentLine.clear();
                 repaint();
             }
         }
     }
-    
+
     private class DrawingMouseMotionListener extends MouseMotionAdapter {
         @Override
         public void mouseDragged(MouseEvent e) {
@@ -198,7 +227,6 @@ public class DrawingPanel extends JPanel {
             }
         }
     }
-    
 
     public void zoomIn() {
         scaleFactor *= 1.1; // Increase scale factor for zooming in
