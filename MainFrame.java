@@ -96,17 +96,14 @@ public class MainFrame extends JFrame {
         textboxMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.toggleTextboxMode();
-                // Use the isTextboxModeActive method to check the mode
-                if (drawingPanel.isTextboxModeActive()) {
-                    drawingPanel.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
-                } else {
-                    drawingPanel.setCursor(Cursor.getDefaultCursor());
+                // Placeholder for textbox logic
+                String text = JOptionPane.showInputDialog(MainFrame.this, "Enter text:", "Textbox", JOptionPane.PLAIN_MESSAGE);
+                if (text != null && !text.isEmpty()) {
+                    drawingPanel.addText(text); // Implement this method in DrawingPanel
                 }
             }
-        });        
+        });
         editMenu.add(textboxMenuItem);
-        
         
 
 
