@@ -23,7 +23,7 @@ public class DrawingPanel extends JPanel {
     private Shape currentShape;
     private int toolbarsize = 200;
     private List<List<Point>> undoneLines = new ArrayList<>(); // List to store undone lines
-    
+    private boolean eraserMode = false; // Flag to indicate eraser mode
     private double scaleFactor = 1.0; // Scale factor for zooming
     private List<Shape> undoShapes = new ArrayList<>();
     private List<String> undoList = new ArrayList<>();
@@ -42,19 +42,20 @@ public class DrawingPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setStroke(new BasicStroke(currentStrokeWidth)); // Set current stroke width
-
+    
         // Apply zoom
         g2d.scale(scaleFactor, scaleFactor);
-
+    
         // Draw background image if available
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, null);
         }
-
-        // Draw existing lines
+    
+        // Draw existing lines with their respective colors
         for (List<Point> line : scribbleLines) {
             if (line.size() > 1) {
-                g2d.setColor(currentColor);
+                Color lineColor = lineColors.get(line);
+                g2d.setColor(lineColor); // Set the color for this specific line
                 Point prevPoint = line.get(0);
                 for (int i = 1; i < line.size(); i++) {
                     Point currentPoint = line.get(i);
@@ -63,10 +64,10 @@ public class DrawingPanel extends JPanel {
                 }
             }
         }
-
-        // Draw current line
+    
+        // Draw current line with the current color
         if (currentLine.size() > 1) {
-            g2d.setColor(currentColor);
+            g2d.setColor(currentColor); // Use the current color for the current line
             Point prevPoint = currentLine.get(0);
             for (int i = 1; i < currentLine.size(); i++) {
                 Point currentPoint = currentLine.get(i);
@@ -74,19 +75,20 @@ public class DrawingPanel extends JPanel {
                 prevPoint = currentPoint;
             }
         }
-
+    
         for (Shape shape : shapes) {
             drawShape(g2d, shape);
         }
-
+    
         // Draw current shape if any...
         if (currentShape != null) {
             drawShape(g2d, currentShape);
         }
-
+    
         g2d.dispose();
     }
 
+    
     public void saveImage(File file) throws IOException {
         BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = image.createGraphics();
@@ -95,10 +97,10 @@ public class DrawingPanel extends JPanel {
         ImageIO.write(image, "PNG", file);
     }
     public void openImage(File file) throws IOException {
-        backgroundImage = ImageIO.read(file);
-        repaint();
-    }
-    
+    backgroundImage = ImageIO.read(file);
+    repaint();
+}
+
 
     public void undo() {
         
@@ -193,7 +195,7 @@ public class DrawingPanel extends JPanel {
                 currentLine.add(e.getPoint());
             }
         }
-
+    
         @Override
         public void mouseReleased(MouseEvent e) {
             if (currentShape != null) {
@@ -206,6 +208,7 @@ public class DrawingPanel extends JPanel {
                 repaint();
             } else {
                 scribbleLines.add(new ArrayList<>(currentLine));
+                lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current line
                 currentLine.clear();
                 repaint();
             }
@@ -237,4 +240,16 @@ public class DrawingPanel extends JPanel {
         scaleFactor /= 1.1; // Decrease scale factor for zooming out
         repaint();
     }
+    
+    public void toggleEraserMode() {
+        eraserMode = !eraserMode;
+        if (eraserMode) {
+            currentColor = getBackground(); // Dynamically fetches the panel's background color
+            currentStrokeWidth = 2.0f; // Adjust the stroke width for the eraser here
+        } else {
+            currentColor = Color.BLACK; // Reset to default drawing color
+            currentStrokeWidth = 2.0f; // Reset to default stroke width
+        }
+    }
+    
 }

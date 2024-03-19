@@ -71,6 +71,9 @@ public class MainFrame extends JFrame {
         fileMenu.add(saveMenuItem);
 
 
+
+
+
         JMenuItem quitMenuItem = new JMenuItem("Quit");
         quitMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -79,9 +82,34 @@ public class MainFrame extends JFrame {
             }
         });
         fileMenu.add(quitMenuItem);
-
-
+ 
         JMenu editMenu = new JMenu("Edit");
+        JMenuItem eraserMenuItem = new JMenuItem("Eraser");
+        eraserMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.toggleEraserMode();
+            }
+        });
+        editMenu.add(eraserMenuItem);
+        JMenuItem textboxMenuItem = new JMenuItem("Textbox");
+        textboxMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.toggleTextboxMode();
+                // Use the isTextboxModeActive method to check the mode
+                if (drawingPanel.isTextboxModeActive()) {
+                    drawingPanel.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
+                } else {
+                    drawingPanel.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });        
+        editMenu.add(textboxMenuItem);
+        
+        
+
+
         JMenuItem undoMenuItem = new JMenuItem("Undo");
         undoMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -90,6 +118,15 @@ public class MainFrame extends JFrame {
             }
         });
         editMenu.add(undoMenuItem);
+        
+        JMenuItem redoMenuItem = new JMenuItem("Redo");
+        redoMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.redo();
+            }
+        });
+        editMenu.add(redoMenuItem);
 
         JMenu zoomMenu = new JMenu("Zoom");
         JMenuItem zoomInMenuItem = new JMenuItem("Zoom In");
@@ -111,14 +148,7 @@ public class MainFrame extends JFrame {
         zoomMenu.add(zoomOutMenuItem);
         
     
-        JMenuItem redoMenuItem = new JMenuItem("Redo");
-        redoMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.redo();
-            }
-        });
-        editMenu.add(redoMenuItem);
+
 
 
         JMenu colorMenu = new JMenu("Color");
@@ -155,7 +185,6 @@ public class MainFrame extends JFrame {
         shapeMenu.add(ovalMenuItem);
 
         // Add more shape options as needed...
-
         menuBar.add(fileMenu);
         menuBar.add(shapeMenu);
         menuBar.add(colorMenu);
