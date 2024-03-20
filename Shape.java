@@ -4,6 +4,8 @@ import java.io.Serializable;
 public class Shape implements Serializable {
     public static final int RECTANGLE = 0;
     public static final int OVAL = 1;
+    public static final int STRAIGHT_LINE = 2;
+
 
     private int x1;
     private int y1;
@@ -76,5 +78,3 @@ public class Shape implements Serializable {
         this.stroke = stroke;
     }
 }
-
-

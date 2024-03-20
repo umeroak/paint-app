@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class MainFrame extends JFrame {
     private DrawingPanel drawingPanel;
@@ -18,10 +20,36 @@ public class MainFrame extends JFrame {
         getContentPane().add(drawingPanel);
         new KeyboardHandler(drawingPanel);
 
-
+        createButton();
         createMenuBar();
 
         setVisible(true);
+    }
+
+    private void createButton()
+    {
+        JPanel buttonPanel = new JPanel();
+
+        JButton increase = new JButton("INCREASE");
+        increase.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.increaseSize();
+            }
+        });
+        JButton decrease = new JButton("DECREASE");
+        decrease.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.decreaseSize();
+            }
+        });
+        buttonPanel.add(increase);
+        buttonPanel.add(decrease);
+        
+        // Add the buttonPanel to the JFrame's content pane
+        getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
     }
 
     private void createMenuBar() {
@@ -92,18 +120,7 @@ public class MainFrame extends JFrame {
             }
         });
         editMenu.add(eraserMenuItem);
-        JMenuItem textboxMenuItem = new JMenuItem("Textbox");
-        textboxMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Placeholder for textbox logic
-                String text = JOptionPane.showInputDialog(MainFrame.this, "Enter text:", "Textbox", JOptionPane.PLAIN_MESSAGE);
-                if (text != null && !text.isEmpty()) {
-                    drawingPanel.addText(text); // Implement this method in DrawingPanel
-                }
-            }
-        });
-        editMenu.add(textboxMenuItem);
+  
         
 
 
@@ -181,16 +198,96 @@ public class MainFrame extends JFrame {
         });
         shapeMenu.add(ovalMenuItem);
 
+        JMenuItem straightLineMenuItem = new JMenuItem("Straight Line");
+        straightLineMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.STRAIGHT_LINE);
+            }
+        });
+        shapeMenu.add(straightLineMenuItem);
+
+        JMenu highlighterMenu = new JMenu("Highlighter");
+        JMenuItem highlighterMenuItem = new JMenuItem("Highlighter");
+        highlighterMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.HIGHLIGHTER, 15)); // Set the same properties as the transparent brush
+            }
+        });
+        highlighterMenu.add(highlighterMenuItem);
+
+        JMenu brushMenu = new JMenu("Brush");
+        JMenuItem normalBrushMenuItem = new JMenuItem("Default");
+        normalBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.DEFAULT, 10));
+            }
+        });
+        brushMenu.add(normalBrushMenuItem);
+
+        JMenuItem markerBrushMenuItem = new JMenuItem("Marker");
+        markerBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.MARKER, 10));
+            }
+        });
+        brushMenu.add(markerBrushMenuItem);
+
+        JMenuItem pencilBrushMenuItem = new JMenuItem("Pencil");
+        pencilBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PENCIL, 7));
+            }
+        });
+        brushMenu.add(pencilBrushMenuItem);
+
+        JMenuItem penBrushMenuItem = new JMenuItem("Pen");
+        penBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PEN, 10));
+            }
+        });
+        brushMenu.add(penBrushMenuItem);
+
+        JMenuItem crayonBrushMenuItem = new JMenuItem("Crayon");
+        crayonBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.CRAYON, 6));
+            }
+        });
+        brushMenu.add(crayonBrushMenuItem);
+
+        JMenuItem sprayPaintBrushMenuItem = new JMenuItem("Spray Paint"); // New brush menu item
+        sprayPaintBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.SPRAY_PAINT, 10)); // Use a default size for spray paint
+            }
+        });
+        brushMenu.add(sprayPaintBrushMenuItem);
+
         // Add more shape options as needed...
         menuBar.add(fileMenu);
         menuBar.add(shapeMenu);
         menuBar.add(colorMenu);
         menuBar.add(editMenu);
-        menuBar.add(zoomMenu); // Add the zoom menu to the menu bar
+        menuBar.add(zoomMenu);
+        menuBar.add(brushMenu);
+        menuBar.add(highlighterMenu);
         setJMenuBar(menuBar);
     }
-
     public static void main(String[] args) {
-        new MainFrame();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new MainFrame();
+            }
+        });
     }
 }

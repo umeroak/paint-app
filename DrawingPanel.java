@@ -33,10 +33,9 @@ public class DrawingPanel extends JPanel {
     private List<Integer> size = new ArrayList<>();// arraylist of size, set size, increase size = setsize getsize+5
     private int brushSize = 10;
 
-
     public DrawingPanel() {
         setBackground(Color.WHITE);
-        setPreferredSize(new Dimension(800, 600)); // Set default size
+        setPreferredSize(new Dimension(800, 600)); // Set DEFAULT size
         addMouseListener(new DrawingMouseListener());
         addMouseMotionListener(new DrawingMouseMotionListener());
     }
@@ -47,16 +46,13 @@ public class DrawingPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setStroke(new BasicStroke(currentStrokeWidth)); // Set current stroke width
-    
-        // Apply zoom
-        g2d.scale(scaleFactor, scaleFactor);
-    
-        // Draw background image if available
+
+        
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, null);
         }
-    
-        // Draw existing lines with their respective colors
+
+        // Draw existing lines
         int count = 0;
         for (List<Point> line : scribbleLines) {
             if (line.size() > 1) {
@@ -65,6 +61,7 @@ public class DrawingPanel extends JPanel {
                 Brush temp = new Brush(Brush.BrushType.DEFAULT, linesize);
                 if(type.get(count)==1)
                 {
+                    
                     g2d.setStroke(new BasicStroke(linesize));
                     for (int i = 1; i < line.size(); i++) {
                         Point currentPoint = line.get(i);
@@ -145,8 +142,7 @@ public class DrawingPanel extends JPanel {
             }
         }
 
-    
-        //Draw current line
+        // Draw current line
         if (currentLine.size() > 1) {
             int linesize = size.get(size.size()-1);//altered this paints depending on type now -shafiul
             g2d.setColor(currentColor);
@@ -249,8 +245,6 @@ public class DrawingPanel extends JPanel {
         brushSize-=5;
     }
 
-
-
     public void saveImage(File file) throws IOException {
         BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = image.createGraphics();
@@ -260,10 +254,9 @@ public class DrawingPanel extends JPanel {
     }
 
     public void openImage(File file) throws IOException {
-    backgroundImage = ImageIO.read(file);
-    repaint();
+        backgroundImage = ImageIO.read(file);
+        repaint();
     }
-
 
     public void undo() {
         
@@ -310,6 +303,8 @@ public class DrawingPanel extends JPanel {
             undoList.add(redoList.remove(redoList.size()-1));
         }
     }
+    
+    
 
     public void setCurrentColor(Color color) {
         this.currentColor = color;
@@ -318,6 +313,12 @@ public class DrawingPanel extends JPanel {
     public void setStrokeWidth(float width) {
         this.currentStrokeWidth = width;
     }
+
+    public void setCurrentBrush(Brush brush) {
+        this.currentBrush = brush;
+    }
+
+    
 
     private void drawShape(Graphics2D g2d, Shape shape) {
         g2d.setColor(shape.getColor());
@@ -338,13 +339,14 @@ public class DrawingPanel extends JPanel {
             case Shape.STRAIGHT_LINE:
                 g2d.drawLine(x1, y1, x2, y2);
                 break;
+            // Add more shape types if needed...
         }
     }
+
     public void setCurrentShape(int shapeType) {
         currentShape = new Shape(0, 0, 0, 0, Color.BLACK, new BasicStroke(2.0f), shapeType);
         repaint();
     }
-
 
     private class DrawingMouseListener extends MouseAdapter {
         @Override
@@ -353,42 +355,72 @@ public class DrawingPanel extends JPanel {
                 int x = e.getX();
                 int y = e.getY();
                 currentShape = new Shape(x, y, x, y, currentColor, new BasicStroke(currentStrokeWidth), currentShape.getShape());
+                undoList.add("Shape");
             } else {
                 size.add(brushSize);
                 if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT) {
                     type.add(1);
                     currentLine.add(e.getPoint());
+                    undoList.add("Pen");
+                    currentLine.clear();
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.HIGHLIGHTER){
 
                     type.add(2);
                     currentLine.add(e.getPoint());
+                    undoList.add("Pen");
+                    currentLine.clear();
+
+
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.MARKER){
 
                     type.add(3);
                     currentLine.add(e.getPoint());
+                    undoList.add("Pen");
+                    currentLine.clear();
+
+
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.PENCIL){
 
                     type.add(4);
                     currentLine.add(e.getPoint());
+                    undoList.add("Pen");
+                    currentLine.clear();
+
+
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.PEN){
 
                     type.add(5);
                     currentLine.add(e.getPoint());
+                    undoList.add("Pen");
+                    currentLine.clear();
+
+
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.CRAYON){
 
                     type.add(6);
                     currentLine.add(e.getPoint());
+                    undoList.add("Pen");
+
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.SPRAY_PAINT){
 
                     type.add(7);
                     currentLine.add(e.getPoint());
+                    undoList.add("Pen");
+                    currentLine.clear();
+
+
                 }
+                List<Point> newLine = new ArrayList<>(currentLine);
+                scribbleLines.add(newLine); // Add the line to scribbleLines
+                List<Color> colors = new ArrayList<>();
+                colors.add(currentColor); // Store the initial color
+                lineColors.put(newLine, colors);
 
             }
         }
@@ -407,41 +439,49 @@ public class DrawingPanel extends JPanel {
             } else {
                 if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT) {
                     scribbleLines.add(new ArrayList<>(currentLine));
+                    lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current line
                     currentLine.clear();
                     repaint();
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.HIGHLIGHTER) {//same here
                     scribbleLines.add(new ArrayList<>(currentLine));
+                    lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current line
                     currentLine.clear();
                     repaint();
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.MARKER) {//same here
                     scribbleLines.add(new ArrayList<>(currentLine));
+                    lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current line
                     currentLine.clear();
                     repaint();
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.PENCIL) {//same here
                     scribbleLines.add(new ArrayList<>(currentLine));
+                    lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current line
                     currentLine.clear();
                     repaint();
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.PEN) {//same here
                     scribbleLines.add(new ArrayList<>(currentLine));
+                    lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current line
                     currentLine.clear();
                     repaint();
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.PEN) {//same here
                     scribbleLines.add(new ArrayList<>(currentLine));
+                    lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current line
                     currentLine.clear();
                     repaint();
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.CRAYON) {//same here
                     scribbleLines.add(new ArrayList<>(currentLine));
+                    lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current line
                     currentLine.clear();
                     repaint();
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.SPRAY_PAINT) {//same here
                     scribbleLines.add(new ArrayList<>(currentLine));
+                    lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current line
                     currentLine.clear();
                     repaint();
                 }
@@ -453,52 +493,38 @@ public class DrawingPanel extends JPanel {
         @Override
         public void mouseDragged(MouseEvent e) {
             if (currentShape != null) {
+                // If a shape is being drawn, update its coordinates and repaint
                 int x = e.getX();
                 int y = e.getY();
                 currentShape.setX2(x);
                 currentShape.setY2(y);
                 repaint();
             } else {
-                if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT) {
-                    currentLine.add(e.getPoint());
-                    repaint();
-                } else {
-                    if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT ||
+                // If drawing freehand lines
+                if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT ||
                     currentBrush.getBrushType() == Brush.BrushType.HIGHLIGHTER || 
                     currentBrush.getBrushType() == Brush.BrushType.MARKER || 
                     currentBrush.getBrushType() == Brush.BrushType.PENCIL ||
                     currentBrush.getBrushType() == Brush.BrushType.PEN ||
                     currentBrush.getBrushType() == Brush.BrushType.CRAYON ||
-                    currentBrush.getBrushType() == Brush.BrushType.SPRAY_PAINT)
+                    currentBrush.getBrushType() == Brush.BrushType.SPRAY_PAINT) {
                     
-                    
-                     {
+                    // Add the current mouse position to the current line
                     currentLine.add(e.getPoint());
+                    
+                    // Repaint the component to reflect the changes
                     repaint();
+                    
+                    // If the current line already exists in lineColors, add the current color to its list of colors
+                    if (lineColors.containsKey(currentLine)) {
+                        lineColors.get(currentLine).add(currentColor);
+                    }
                 }
             }
+        
+        
+        
         }
         }
     }
-    public void zoomIn() {
-        scaleFactor *= 1.1; // Increase scale factor for zooming in
-        repaint();
-    }
-
-    public void zoomOut() {
-        scaleFactor /= 1.1; // Decrease scale factor for zooming out
-        repaint();
-    }
-    
-    public void toggleEraserMode() {
-        eraserMode = !eraserMode;
-        if (eraserMode) {
-            currentColor = getBackground(); // Dynamically fetches the panel's background color
-            currentStrokeWidth = 2.0f; // Adjust the stroke width for the eraser here
-        } else {
-            currentColor = Color.BLACK; // Reset to default drawing color
-            currentStrokeWidth = 2.0f; // Reset to default stroke width
-        }
-    }
-    
 }
