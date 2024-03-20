@@ -57,7 +57,7 @@ public class DrawingPanel extends JPanel {
         for (List<Point> line : scribbleLines) {
             if (line.size() > 1) {
                 int linesize = size.get(count);
-                g2d.setColor(currentColor);
+                g2d.setColor(lineColors.get(line));
                 Brush temp = new Brush(Brush.BrushType.DEFAULT, linesize);
                 if(type.get(count)==1)
                 {
@@ -129,11 +129,11 @@ public class DrawingPanel extends JPanel {
                 else if(type.get(count) == 7)
                 {
                     
-                     temp = new Brush(Brush.BrushType.SPRAY_PAINT, linesize);//else uses the respective type -shafiul
+                     temp = new Brush(Brush.BrushType.SPRAY_PAINT, 5);//else uses the respective type -shafiul
                      for (int i = 1; i < line.size(); i++) {
                         Point currentPoint = line.get(i);
                         Point prevPoint = line.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
+                        temp.paint(g2d, prevPoint.x, prevPoint.y, 0, 0);
                         prevPoint = currentPoint;
                     }
                 }
@@ -147,6 +147,7 @@ public class DrawingPanel extends JPanel {
             int linesize = size.get(size.size()-1);//altered this paints depending on type now -shafiul
             g2d.setColor(currentColor);
                 Brush temp = new Brush(Brush.BrushType.DEFAULT, linesize);
+                temp.setColor(currentColor);
                 if(type.get(count)==1)
                 {
    
@@ -209,7 +210,7 @@ public class DrawingPanel extends JPanel {
                 }
                 else if(type.get(count) == 7)
                 {
-                     temp = new Brush(Brush.BrushType.SPRAY_PAINT, linesize);//doing the same here-shafiul
+                     temp = new Brush(Brush.BrushType.SPRAY_PAINT, 5);//doing the same here-shafiul
                      for (int i = 1; i < currentLine.size(); i++) {
                         Point currentPoint = currentLine.get(i);
                         Point prevPoint = currentLine.get(i-1);
@@ -420,7 +421,7 @@ public class DrawingPanel extends JPanel {
                 scribbleLines.add(newLine); // Add the line to scribbleLines
                 List<Color> colors = new ArrayList<>();
                 colors.add(currentColor); // Store the initial color
-                lineColors.put(newLine, colors);
+               
 
             }
         }
@@ -437,6 +438,7 @@ public class DrawingPanel extends JPanel {
                 currentShape = null;
                 repaint();
             } else {
+                lineColors.put(new ArrayList<>(currentLine), currentColor);
                 if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT) {
                     scribbleLines.add(new ArrayList<>(currentLine));
                     lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current line
@@ -516,9 +518,7 @@ public class DrawingPanel extends JPanel {
                     repaint();
                     
                     // If the current line already exists in lineColors, add the current color to its list of colors
-                    if (lineColors.containsKey(currentLine)) {
-                        lineColors.get(currentLine).add(currentColor);
-                    }
+                    
                 }
             }
         
@@ -527,4 +527,3 @@ public class DrawingPanel extends JPanel {
         }
         }
     }
-}

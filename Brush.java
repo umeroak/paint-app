@@ -14,7 +14,7 @@ public class Brush {
 
     private BrushType brushType;
     private int size;
-    
+    private Color color;
    
 
 
@@ -36,6 +36,14 @@ public class Brush {
     public void setSize(int x)
     {
         size = x;
+    }
+
+     public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public void paint(Graphics2D g2d, int x, int y, int normalx, int normaly) {
@@ -106,7 +114,7 @@ public class Brush {
                 for (int i = 0; i < spraySize; i++) {
                     int offsetX = random1.nextInt(size * 2) - size;
                     int offsetY = random1.nextInt(size * 2) - size;
-                    g2d.drawLine(x + offsetX, y + offsetY, normalx, normaly);
+                    g2d.drawLine(x + offsetX, y + offsetY, 1, 1);
                 }
                 break;
                 default:
