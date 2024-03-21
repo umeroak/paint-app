@@ -257,11 +257,18 @@ public class DrawingPanel extends JPanel {
     {
         //currentBrush.setSize(currentBrush.getSize()+5);
         brushSize+=5;
+        System.out.println(brushSize);
+
     }
     public void decreaseSize()
     {
-        //currentBrush.setSize(currentBrush.getSize()-5);
-        brushSize-=5;
+        if (brushSize!=0){
+            brushSize-=5;
+            System.out.println(brushSize);
+        }
+        else{
+            brushSize=0;
+        }
     }
 
     public void saveImage(File file) throws IOException {
