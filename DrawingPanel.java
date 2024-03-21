@@ -34,6 +34,7 @@ public class DrawingPanel extends JPanel {
     private Brush currentBrush = new Brush(Brush.BrushType.DEFAULT, 10); // Default brush
     private List<Integer> type = new ArrayList<>();//                                               added type arrayList for brush type -shafiul
     private List<Integer> size = new ArrayList<>();// arraylist of size, set size, increase size = setsize getsize+5
+    private List<Integer> undoSizes = new ArrayList<>();
     private int brushSize = 10;
 
     public DrawingPanel() {
@@ -306,6 +307,7 @@ public class DrawingPanel extends JPanel {
             {
                 if (!scribbleLines.isEmpty()) {
                     undoneLines.add(scribbleLines.remove(scribbleLines.size() - 1)); // Move the undone line to undoneLines
+                    undoSizes.add(size.remove(size.size()-1));
                     repaint();
                 }
             }
@@ -329,6 +331,7 @@ public class DrawingPanel extends JPanel {
             {
                 if (!undoneLines.isEmpty()) {
                     scribbleLines.add(undoneLines.remove(undoneLines.size() - 1)); // Move the undone line back to scribbleLines
+                    size.add(undoSizes.remove(undoSizes.size()-1));
                     repaint();
                 }
             }
