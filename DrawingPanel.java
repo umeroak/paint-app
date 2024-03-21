@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 public class DrawingPanel extends JPanel {
+    private ArrayList<TextBox> textBoxes;
+    private TextBox textBox;
+    private Point textBoxOffset;
     private List<List<Point>> scribbleLines = new ArrayList<>();
     private List<Point> currentLine = new ArrayList<>();
     private Color currentColor = Color.BLACK; // Default drawing color
@@ -38,6 +41,7 @@ public class DrawingPanel extends JPanel {
         setPreferredSize(new Dimension(800, 600)); // Set DEFAULT size
         addMouseListener(new DrawingMouseListener());
         addMouseMotionListener(new DrawingMouseMotionListener());
+        setLayout(null);
     }
 
     @Override
@@ -233,6 +237,7 @@ public class DrawingPanel extends JPanel {
         if (currentShape != null) {
             drawShape(g2d, currentShape);
         }
+        
 
         g2d.dispose();
     }
@@ -270,6 +275,20 @@ public class DrawingPanel extends JPanel {
     public void openImage(File file) throws IOException {
         backgroundImage = ImageIO.read(file);
         repaint();
+    }
+    public void showTextBox(Point location, Dimension size) {
+        textBox = new TextBox(location, size);
+        add(textBox);
+        revalidate();
+        repaint();
+    }
+
+    public void hideTextBox() {
+        if (textBox != null) {
+            remove(textBox);
+            textBox = null;
+            repaint();
+        }
     }
 
     public void undo() {
@@ -381,6 +400,8 @@ public class DrawingPanel extends JPanel {
                 int y = e.getY();
                 currentShape = new Shape(x, y, x, y, currentColor, new BasicStroke(currentStrokeWidth), currentShape.getShape());
                 undoList.add("Shape");
+            }else if (textBox != null && textBox.contains(e.getPoint())) {
+                textBoxOffset = new Point(e.getX() - textBox.getX(), e.getY() - textBox.getY());
             } else {
                 size.add(brushSize);
                 if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT) {
@@ -430,6 +451,8 @@ public class DrawingPanel extends JPanel {
                     type.add(6);
                     currentLine.add(e.getPoint());
                     undoList.add("Pen");
+                    currentLine.clear();
+
 
                 }
                 else if (currentBrush.getBrushType() == Brush.BrushType.SPRAY_PAINT){
@@ -453,6 +476,7 @@ public class DrawingPanel extends JPanel {
 
         @Override
         public void mouseReleased(MouseEvent e) {
+            textBoxOffset = null;
             if (currentShape != null) {
                 int x = e.getX();
                 int y = e.getY();
@@ -525,6 +549,12 @@ public class DrawingPanel extends JPanel {
                 currentShape.setX2(x);
                 currentShape.setY2(y);
                 repaint();
+            } else if (textBox != null && textBoxOffset != null) {
+                int newX = e.getX() - textBoxOffset.x;
+                int newY = e.getY() - textBoxOffset.y;
+                textBox.setLocation(new Point(newX, newY));
+                repaint();
+                
             } else {
                 // If drawing freehand lines
                 if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT ||

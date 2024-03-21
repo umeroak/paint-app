@@ -44,8 +44,29 @@ public class MainFrame extends JFrame {
                 drawingPanel.decreaseSize();
             }
         });
+        JButton addTextBoxButton = new JButton("Add Text Box");
+        addTextBoxButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Call the method to add a text box to the drawing panel
+                drawingPanel.showTextBox(new Point(100, 100), new Dimension(100, 50)); // Example initial location and size
+            }
+        });
+    
+        JButton removeTextBoxButton = new JButton("Remove Text Box");
+        removeTextBoxButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Call the method to remove the text box from the drawing panel
+                drawingPanel.hideTextBox();
+            }
+        });
+    
         buttonPanel.add(increase);
         buttonPanel.add(decrease);
+        buttonPanel.add(addTextBoxButton);
+        buttonPanel.add(removeTextBoxButton);
+
         
         // Add the buttonPanel to the JFrame's content pane
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
