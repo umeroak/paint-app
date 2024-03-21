@@ -471,8 +471,7 @@ public class DrawingPanel extends JPanel {
 
 
                 }
-                List<Point> newLine = new ArrayList<>(currentLine);
-                scribbleLines.add(newLine); // Add the line to scribbleLines
+
                 List<Color> colors = new ArrayList<>();
                 colors.add(currentColor); // Store the initial color
                
