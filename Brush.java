@@ -114,7 +114,7 @@ public class Brush {
                 for (int i = 0; i < spraySize; i++) {
                     int offsetX = random1.nextInt(size * 2) - size;
                     int offsetY = random1.nextInt(size * 2) - size;
-                    g2d.drawLine(x + offsetX, y + offsetY, 1, 1);
+                    g2d.fillRect(x + offsetX, y + offsetY, 1, 1);
                 }
                 break;
                 default:
