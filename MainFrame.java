@@ -252,7 +252,7 @@ public class MainFrame extends JFrame {
         markerBrushMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.MARKER, 10));
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.MARKER, 7));
             }
         });
         brushMenu.add(markerBrushMenuItem);
@@ -261,7 +261,7 @@ public class MainFrame extends JFrame {
         pencilBrushMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PENCIL, 7));
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PENCIL, 3));
             }
         });
         brushMenu.add(pencilBrushMenuItem);
@@ -270,7 +270,7 @@ public class MainFrame extends JFrame {
         penBrushMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PEN, 10));
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PEN, 5));
             }
         });
         brushMenu.add(penBrushMenuItem);
@@ -288,7 +288,7 @@ public class MainFrame extends JFrame {
         sprayPaintBrushMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.SPRAY_PAINT, 10)); // Use a default size for spray paint
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.SPRAY_PAINT, 5)); // Use a default size for spray paint
             }
         });
         brushMenu.add(sprayPaintBrushMenuItem);

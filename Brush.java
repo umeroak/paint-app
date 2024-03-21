@@ -53,11 +53,13 @@ public class Brush {
             g2d.drawLine(x, y, normalx, normaly);
                 break;
             case HIGHLIGHTER:
+                g2d.setStroke(new BasicStroke(size));
                 Color highlighterColor = new Color (g2d.getColor().getRed(), g2d.getColor().getGreen(), g2d.getColor().getBlue(), 20);
                 g2d.setColor(highlighterColor);
                 g2d.drawLine(x - size / 2, y - size / 2, normalx, normaly);
                 break;
             case MARKER:
+                g2d.setStroke(new BasicStroke(size));
                 int markerSize = size * 2; 
                 Color markerColor = new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(), g2d.getColor().getBlue(), 100); 
                 g2d.setColor(markerColor);
@@ -65,15 +67,18 @@ public class Brush {
                 
                 break;
             case PENCIL:
+            g2d.setStroke(new BasicStroke(size));
             g2d.setColor(g2d.getColor());
         
             g2d.drawLine(x, y, x, y);
                 break;
             case PEN:
+            g2d.setStroke(new BasicStroke(size));
             g2d.setColor(g2d.getColor());
                 g2d.drawLine(x - size / 2, y - size / 2, normalx, normaly); 
                 break;
             case CRAYON:
+                g2d.setStroke(new BasicStroke(size));
                 g2d.setColor(g2d.getColor());
                 Random random = new Random();
     

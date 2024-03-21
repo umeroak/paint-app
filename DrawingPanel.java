@@ -88,7 +88,7 @@ public class DrawingPanel extends JPanel {
                     }
                 }
                 
-                else if(type.get(count) == 3)
+                else if(type.get(count) == 7)
                 {
                     
                      temp = new Brush(Brush.BrushType.MARKER, linesize);//else uses the respective type -shafiul
@@ -99,7 +99,7 @@ public class DrawingPanel extends JPanel {
                         prevPoint = currentPoint;
                     }
                 }
-                else if(type.get(count) == 4)
+                else if(type.get(count) == 3)
                 {
                     
                      temp = new Brush(Brush.BrushType.PENCIL, linesize);//else uses the respective type -shafiul
@@ -132,7 +132,7 @@ public class DrawingPanel extends JPanel {
                         prevPoint = currentPoint;
                     }
                 }
-                else if(type.get(count) == 7)
+                else if(type.get(count) == 5)
                 {
                     
                      temp = new Brush(Brush.BrushType.SPRAY_PAINT, 5);//else uses the respective type -shafiul
@@ -174,7 +174,7 @@ public class DrawingPanel extends JPanel {
                         prevPoint = currentPoint;
                     }
                 }
-                else if(type.get(count) == 3)
+                else if(type.get(count) == 7)
                 {
                      temp = new Brush(Brush.BrushType.MARKER, linesize);//doing the same here-shafiul
                      for (int i = 1; i < currentLine.size(); i++) {
@@ -184,7 +184,7 @@ public class DrawingPanel extends JPanel {
                         prevPoint = currentPoint;
                     }
                 }
-                else if(type.get(count) == 4)
+                else if(type.get(count) == 3)
                 {
                      temp = new Brush(Brush.BrushType.PENCIL, linesize);//doing the same here-shafiul
                      for (int i = 1; i < currentLine.size(); i++) {
@@ -214,7 +214,7 @@ public class DrawingPanel extends JPanel {
                         prevPoint = currentPoint;
                     }
                 }
-                else if(type.get(count) == 7)
+                else if(type.get(count) == 5)
                 {
                      temp = new Brush(Brush.BrushType.SPRAY_PAINT, 5);//doing the same here-shafiul
                      for (int i = 1; i < currentLine.size(); i++) {
