@@ -273,11 +273,11 @@ public class MainFrame extends JFrame {
         brushMenu.add(sprayPaintBrushMenuItem);
 
         // Add more shape options as needed...
+        menuBar.add(zoomMenu);
         menuBar.add(fileMenu);
         menuBar.add(shapeMenu);
         menuBar.add(colorMenu);
         menuBar.add(editMenu);
-        menuBar.add(zoomMenu);
         menuBar.add(brushMenu);
         menuBar.add(highlighterMenu);
         setJMenuBar(menuBar);

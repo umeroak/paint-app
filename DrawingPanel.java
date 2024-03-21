@@ -47,6 +47,8 @@ public class DrawingPanel extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setStroke(new BasicStroke(currentStrokeWidth)); // Set current stroke width
 
+        // Apply zoom
+        g2d.scale(scaleFactor, scaleFactor);
         
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, null);
@@ -235,6 +237,17 @@ public class DrawingPanel extends JPanel {
         g2d.dispose();
     }
 
+    public void zoomIn() {
+        scaleFactor *= 1.1; // Increase scale factor for zooming in
+        repaint();
+    }
+
+    public void zoomOut() {
+        scaleFactor /= 1.1; // Decrease scale factor for zooming out
+        repaint();
+    }
+    
+
     public void increaseSize()
     {
         //currentBrush.setSize(currentBrush.getSize()+5);
@@ -317,6 +330,17 @@ public class DrawingPanel extends JPanel {
 
     public void setCurrentBrush(Brush brush) {
         this.currentBrush = brush;
+    }
+
+    public void toggleEraserMode() {
+        eraserMode = !eraserMode;
+        if (eraserMode) {
+            currentColor = getBackground(); // Dynamically fetches the panel's background color
+            currentStrokeWidth = 2.0f; // Adjust the stroke width for the eraser here
+        } else {
+            currentColor = Color.BLACK; // Reset to default drawing color
+            currentStrokeWidth = 2.0f; // Reset to default stroke width
+        }
     }
 
     
