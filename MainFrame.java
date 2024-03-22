@@ -10,6 +10,7 @@ import javax.swing.event.ChangeListener;
 public class MainFrame extends JFrame {
     private DrawingPanel drawingPanel;
 
+
     public MainFrame() {
         setTitle("Simple Painting App");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,11 +62,22 @@ public class MainFrame extends JFrame {
                 drawingPanel.hideTextBox();
             }
         });
+
+
+        JButton fillMenuItem = new JButton("Fill");
+        fillMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setShouldPerformFill(true);  // Set the flag to true
+                drawingPanel.fill.add(new Fill());     
+            }
+        });
     
         buttonPanel.add(increase);
         buttonPanel.add(decrease);
         buttonPanel.add(addTextBoxButton);
         buttonPanel.add(removeTextBoxButton);
+        buttonPanel.add(fillMenuItem);
 
         
         // Add the buttonPanel to the JFrame's content pane
@@ -119,10 +131,6 @@ public class MainFrame extends JFrame {
         });
         fileMenu.add(saveMenuItem);
 
-
-
-
-
         JMenuItem quitMenuItem = new JMenuItem("Quit");
         quitMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -141,9 +149,6 @@ public class MainFrame extends JFrame {
             }
         });
         editMenu.add(eraserMenuItem);
-  
-        
-
 
         JMenuItem undoMenuItem = new JMenuItem("Undo");
         undoMenuItem.addActionListener(new ActionListener() {
@@ -171,6 +176,7 @@ public class MainFrame extends JFrame {
                 drawingPanel.zoomIn();
             }
         });
+
         zoomMenu.add(zoomInMenuItem);
         
         JMenuItem zoomOutMenuItem = new JMenuItem("Zoom Out");
@@ -181,11 +187,7 @@ public class MainFrame extends JFrame {
             }
         });
         zoomMenu.add(zoomOutMenuItem);
-        
-    
-
-
-
+       
         JMenu colorMenu = new JMenu("Color");
         JMenuItem colorMenuItem = new JMenuItem("Choose Color");
         colorMenuItem.addActionListener(new ActionListener() {
@@ -252,7 +254,7 @@ public class MainFrame extends JFrame {
         markerBrushMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.MARKER, 7));
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.MARKER, 10));
             }
         });
         brushMenu.add(markerBrushMenuItem);
@@ -261,7 +263,7 @@ public class MainFrame extends JFrame {
         pencilBrushMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PENCIL, 3));
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PENCIL, 7));
             }
         });
         brushMenu.add(pencilBrushMenuItem);
@@ -270,7 +272,7 @@ public class MainFrame extends JFrame {
         penBrushMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PEN, 5));
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PEN, 10));
             }
         });
         brushMenu.add(penBrushMenuItem);
@@ -288,7 +290,7 @@ public class MainFrame extends JFrame {
         sprayPaintBrushMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.SPRAY_PAINT, 5)); // Use a default size for spray paint
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.SPRAY_PAINT, 10)); // Use a default size for spray paint
             }
         });
         brushMenu.add(sprayPaintBrushMenuItem);
