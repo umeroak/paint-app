@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DrawingPanel extends JPanel {
+    public List<Fill> fill = new ArrayList<>(); 
     private ArrayList<TextBox> textBoxes;
     private TextBox textBox;
     private Point textBoxOffset;
@@ -34,8 +35,10 @@ public class DrawingPanel extends JPanel {
     private Brush currentBrush = new Brush(Brush.BrushType.DEFAULT, 10); // Default brush
     private List<Integer> type = new ArrayList<>();//                                               added type arrayList for brush type -shafiul
     private List<Integer> size = new ArrayList<>();// arraylist of size, set size, increase size = setsize getsize+5
-    private List<Integer> undoSizes = new ArrayList<>();
     private int brushSize = 10;
+    private List<Integer> undoSizes = new ArrayList<>();
+    private boolean shouldPerformFill = false;
+
 
     public DrawingPanel() {
         setBackground(Color.WHITE);
@@ -89,7 +92,7 @@ public class DrawingPanel extends JPanel {
                     }
                 }
                 
-                else if(type.get(count) == 7)
+                else if(type.get(count) == 3)
                 {
                     
                      temp = new Brush(Brush.BrushType.MARKER, linesize);//else uses the respective type -shafiul
@@ -100,7 +103,7 @@ public class DrawingPanel extends JPanel {
                         prevPoint = currentPoint;
                     }
                 }
-                else if(type.get(count) == 3)
+                else if(type.get(count) == 4)
                 {
                     
                      temp = new Brush(Brush.BrushType.PENCIL, linesize);//else uses the respective type -shafiul
@@ -133,7 +136,7 @@ public class DrawingPanel extends JPanel {
                         prevPoint = currentPoint;
                     }
                 }
-                else if(type.get(count) == 5)
+                else if(type.get(count) == 7)
                 {
                     
                      temp = new Brush(Brush.BrushType.SPRAY_PAINT, 5);//else uses the respective type -shafiul
@@ -175,7 +178,7 @@ public class DrawingPanel extends JPanel {
                         prevPoint = currentPoint;
                     }
                 }
-                else if(type.get(count) == 7)
+                else if(type.get(count) == 3)
                 {
                      temp = new Brush(Brush.BrushType.MARKER, linesize);//doing the same here-shafiul
                      for (int i = 1; i < currentLine.size(); i++) {
@@ -185,7 +188,7 @@ public class DrawingPanel extends JPanel {
                         prevPoint = currentPoint;
                     }
                 }
-                else if(type.get(count) == 3)
+                else if(type.get(count) == 4)
                 {
                      temp = new Brush(Brush.BrushType.PENCIL, linesize);//doing the same here-shafiul
                      for (int i = 1; i < currentLine.size(); i++) {
@@ -215,7 +218,7 @@ public class DrawingPanel extends JPanel {
                         prevPoint = currentPoint;
                     }
                 }
-                else if(type.get(count) == 5)
+                else if(type.get(count) == 7)
                 {
                      temp = new Brush(Brush.BrushType.SPRAY_PAINT, 5);//doing the same here-shafiul
                      for (int i = 1; i < currentLine.size(); i++) {
@@ -252,23 +255,28 @@ public class DrawingPanel extends JPanel {
         scaleFactor /= 1.1; // Decrease scale factor for zooming out
         repaint();
     }
+
+    public void setShouldPerformFill(boolean shouldPerformFill) {
+        this.shouldPerformFill = shouldPerformFill;
+    }
+    
+    public boolean shouldPerformFill() {
+        return shouldPerformFill;
+    }
     
 
-    public void increaseSize()
-    {
-        //currentBrush.setSize(currentBrush.getSize()+5);
+    public void increaseSize() {
         brushSize+=5;
         System.out.println(brushSize);
-
     }
-    public void decreaseSize()
-    {
-        if (brushSize!=0){
-            brushSize-=5;
-            System.out.println(brushSize);
+    public void decreaseSize() {
+        if (brushSize != 0) {
+        brushSize-=5;
+        System.out.println(brushSize);
         }
-        else{
-            brushSize=0;
+
+        else {
+            brushSize = 0;
         }
     }
 
@@ -307,7 +315,6 @@ public class DrawingPanel extends JPanel {
             {
                 if (!scribbleLines.isEmpty()) {
                     undoneLines.add(scribbleLines.remove(scribbleLines.size() - 1)); // Move the undone line to undoneLines
-                    undoSizes.add(size.remove(size.size()-1));
                     repaint();
                 }
             }
@@ -331,7 +338,7 @@ public class DrawingPanel extends JPanel {
             {
                 if (!undoneLines.isEmpty()) {
                     scribbleLines.add(undoneLines.remove(undoneLines.size() - 1)); // Move the undone line back to scribbleLines
-                    size.add(undoSizes.remove(undoSizes.size()-1));
+                    size.add(undoSizes.remove(undoSizes.size() - 1));
                     repaint();
                 }
             }
@@ -346,11 +353,32 @@ public class DrawingPanel extends JPanel {
             undoList.add(redoList.remove(redoList.size()-1));
         }
     }
-    
-    
+
+    public void fill(int width, int height, int x, int y) {
+        int[][] pixelArray = new int[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                pixelArray[i][j] = currentColor.getRGB();
+            }
+        }
+
+        Color originalColor = new Color(pixelArray[x][y]);
+
+        fill.add(new Fill());
+        
+        Fill fillInstance = fill.get(fill.size() - 1); 
+        fillInstance.floodFill(pixelArray, x, y, originalColor, currentColor);
+
+        setBackground(currentColor); 
+        repaint(); 
+        }
 
     public void setCurrentColor(Color color) {
         this.currentColor = color;
+    }
+
+    public Color getCurrentColor() {
+        return currentColor;
     }
 
     public void setStrokeWidth(float width) {
@@ -404,15 +432,29 @@ public class DrawingPanel extends JPanel {
 
     private class DrawingMouseListener extends MouseAdapter {
         @Override
-        public void mousePressed(MouseEvent e) {
+        public void mousePressed(MouseEvent e) {       
             if (currentShape != null) {
                 int x = e.getX();
                 int y = e.getY();
                 currentShape = new Shape(x, y, x, y, currentColor, new BasicStroke(currentStrokeWidth), currentShape.getShape());
                 undoList.add("Shape");
-            }else if (textBox != null && textBox.contains(e.getPoint())) {
+            }
+            else if (textBox != null && textBox.contains(e.getPoint())) {
                 textBoxOffset = new Point(e.getX() - textBox.getX(), e.getY() - textBox.getY());
-            } else {
+            }
+               
+            else if (shouldPerformFill && !fill.isEmpty()) { 
+                shouldPerformFill = false;
+                int[][] pixelArray = new int[getWidth()][getHeight()]; 
+                Color originalColor = new Color(pixelArray[e.getX()][e.getY()]); 
+    
+                // Trigger fill operation
+                fill.get(0).floodFill(pixelArray, e.getX(), e.getY(), originalColor, currentColor);
+                setBackground(currentColor);
+                undoList.add("Fill");
+                repaint();
+            }
+            else {
                 size.add(brushSize);
                 if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT) {
                     type.add(1);
@@ -474,11 +516,10 @@ public class DrawingPanel extends JPanel {
 
 
                 }
-
+           
                 List<Color> colors = new ArrayList<>();
                 colors.add(currentColor); // Store the initial color
                
-
             }
         }
     
@@ -584,9 +625,6 @@ public class DrawingPanel extends JPanel {
                     
                 }
             }
-        
-        
-        
-        }
+          }
         }
     }
