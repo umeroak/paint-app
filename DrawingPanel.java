@@ -157,7 +157,6 @@ public class DrawingPanel extends JPanel {
             int linesize = size.get(size.size()-1);//altered this paints depending on type now -shafiul
             g2d.setColor(currentColor);
                 Brush temp = new Brush(Brush.BrushType.DEFAULT, linesize);
-                temp.setColor(currentColor);
                 if(type.get(count)==1)
                 {
    
