@@ -201,7 +201,7 @@ public class DrawingPanel extends JPanel {
                     temp = new Brush(Brush.BrushType.DEFAULT, linesize);
                     break;
                 }
-                temp.setColor(currentColor);
+               
                 if(latestType==6)
                 {
                     for (int i = 1; i < currentLine.size(); i++) {
