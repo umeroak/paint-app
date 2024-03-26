@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class DrawingPanel extends JPanel {
-    public List<Fill> fill = new ArrayList<>(); 
     private ArrayList<TextBox> textBoxes;
     private TextBox textBox;
     private Point textBoxOffset;
+    
     private List<List<Point>> scribbleLines = new ArrayList<>();
     private List<Point> currentLine = new ArrayList<>();
     private Color currentColor = Color.BLACK; // Default drawing color
@@ -35,10 +37,36 @@ public class DrawingPanel extends JPanel {
     private Brush currentBrush = new Brush(Brush.BrushType.DEFAULT, 10); // Default brush
     private List<Integer> type = new ArrayList<>();//                                               added type arrayList for brush type -shafiul
     private List<Integer> size = new ArrayList<>();// arraylist of size, set size, increase size = setsize getsize+5
-    private int brushSize = 10;
     private List<Integer> undoSizes = new ArrayList<>();
-    private boolean shouldPerformFill = false;
+    private int brushSize = 10;
+    private int latestType = 0;
+    private BufferedImage colorSpecturm;
+    private Color clickedColor = Color.BLACK;
+    private int r = 0;
+    private int g = 0;
+    private int b = 0;
+    private int followx = 0;
+    private int followy = 0;
+    
 
+    private boolean firstcase = true;
+
+    private BufferedImage rectangleImage;
+    private BufferedImage ovalImage;
+
+    private List<BetterButton> buttonList = new ArrayList<>();
+
+    private BetterButton defaultButton, markerButton,pencilButton,penButton,crayonButton,spraypaintButton,highlighterButton,rectButton,ovalButton,straightButton;
+
+
+
+    public List<Fill> fill = new ArrayList<>();
+    private boolean shouldPerformFill = false;
+    
+
+    //BetterButton rect = new BetterButton(50,50,50,50);
+
+    //BetterButton oval = new BetterButton(50,150,50,50);
 
     public DrawingPanel() {
         setBackground(Color.WHITE);
@@ -46,6 +74,42 @@ public class DrawingPanel extends JPanel {
         addMouseListener(new DrawingMouseListener());
         addMouseMotionListener(new DrawingMouseMotionListener());
         setLayout(null);
+        try {
+            //rectangleImage = ImageIO.read(new File("Rectangle.png"));
+            //ovalImage = ImageIO.read(new File("Oval.png"));
+            colorSpecturm = ImageIO.read(new File("Color.png"));
+            //backgroundImage = ImageIO.read(new File("background.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        createButton();
+    }
+    public void createButton()
+    {
+        defaultButton = new BetterButton(10,10,35,35);
+        markerButton = new BetterButton(50,10,35,35);
+        penButton = new BetterButton(90,10,35,35);
+        pencilButton = new BetterButton(130,10,35,35);
+        crayonButton = new BetterButton(10,50,35,35);
+        spraypaintButton = new BetterButton(50,50,35,35);
+        highlighterButton = new BetterButton(90,50,35,35);
+        rectButton = new BetterButton(130,50,35,35);
+        ovalButton = new BetterButton(10,90,35,35);
+        straightButton = new BetterButton(50,90,35,35);
+
+
+        buttonList.add(defaultButton);
+        buttonList.add(markerButton);
+        buttonList.add(penButton);
+        buttonList.add(pencilButton);
+        buttonList.add(crayonButton);
+        buttonList.add(spraypaintButton);
+        buttonList.add(highlighterButton);
+        buttonList.add(rectButton);
+        buttonList.add(ovalButton);
+        buttonList.add(straightButton);
+        
+        //defaultButton = new BetterButton(10,10,35,35);
     }
 
     @Override
@@ -62,175 +126,32 @@ public class DrawingPanel extends JPanel {
             g.drawImage(backgroundImage, 0, 0, null);
         }
 
+        int toolbarWidth = Math.min(getWidth() / 4, 200);
+        
+        // Draw the toolbar rectangle
+        g2d.setColor(new Color(236,236,236));
+        g2d.fillRect(0, 0, toolbarWidth, getHeight());
+
         // Draw existing lines
-        int count = 0;
-        for (List<Point> line : scribbleLines) {
-            if (line.size() > 1) {
-                int linesize = size.get(count);
-                g2d.setColor(lineColors.get(line));
-                Brush temp = new Brush(Brush.BrushType.DEFAULT, linesize);
-                if(type.get(count)==1)
-                {
-                    
-                    g2d.setStroke(new BasicStroke(linesize));
-                    for (int i = 1; i < line.size(); i++) {
-                        Point currentPoint = line.get(i);
-                        Point prevPoint = line.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y); //if its the normal brush uses drawLine
-                        prevPoint = currentPoint;
-                    }
-                }
-                else if(type.get(count) == 2)
-                {
-                    
-                     temp = new Brush(Brush.BrushType.HIGHLIGHTER, linesize);//else uses the respective type -shafiul
-                     for (int i = 1; i < line.size(); i++) {
-                        Point currentPoint = line.get(i);
-                        Point prevPoint = line.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                    }
-                }
-                
-                else if(type.get(count) == 3)
-                {
-                    
-                     temp = new Brush(Brush.BrushType.MARKER, linesize);//else uses the respective type -shafiul
-                     for (int i = 1; i < line.size(); i++) {
-                        Point currentPoint = line.get(i);
-                        Point prevPoint = line.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                    }
-                }
-                else if(type.get(count) == 4)
-                {
-                    
-                     temp = new Brush(Brush.BrushType.PENCIL, linesize);//else uses the respective type -shafiul
-                     for (int i = 1; i < line.size(); i++) {
-                        Point currentPoint = line.get(i);
-                        Point prevPoint = line.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                    }
-                }
-                else if(type.get(count) == 5)
-                {
-                    
-                     temp = new Brush(Brush.BrushType.PEN, linesize);//else uses the respective type -shafiul
-                     for (int i = 1; i < line.size(); i++) {
-                        Point currentPoint = line.get(i);
-                        Point prevPoint = line.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                    }
-                }
-                else if(type.get(count) == 6)
-                {
-                    
-                     temp = new Brush(Brush.BrushType.CRAYON, linesize);//else uses the respective type -shafiul
-                     for (int i = 1; i < line.size(); i++) {
-                        Point currentPoint = line.get(i);
-                        Point prevPoint = line.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                    }
-                }
-                else if(type.get(count) == 7)
-                {
-                    
-                     temp = new Brush(Brush.BrushType.SPRAY_PAINT, 5);//else uses the respective type -shafiul
-                     for (int i = 1; i < line.size(); i++) {
-                        Point currentPoint = line.get(i);
-                        Point prevPoint = line.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, 0, 0);
-                        prevPoint = currentPoint;
-                    }
-                }
-                
-                count++;//incrementing to get each type currently defined as 1=normal 2=circle 3=transparent
-            }
+        drawAll(g2d, 0);
+        drawCurrent(g2d);
+        g2d.setColor(new Color(236,236,236));
+        g2d.fillRect(0, 0, toolbarWidth, getHeight());
+
+        for(int i=0;i<buttonList.size();i++)
+        {
+            buttonList.get(i).Paint(g2d);
+        }
+        
+        if(colorSpecturm!=null)
+        {
+            g.drawImage(colorSpecturm, 20,200,null);
         }
 
-        // Draw current line
-        if (currentLine.size() > 1) {
-            int linesize = size.get(size.size()-1);//altered this paints depending on type now -shafiul
-            g2d.setColor(currentColor);
-                Brush temp = new Brush(Brush.BrushType.DEFAULT, linesize);
-                if(type.get(count)==1)
-                {
-   
-                     for (int i = 1; i < currentLine.size(); i++) {
-                        Point currentPoint = currentLine.get(i);
-                        Point prevPoint = currentLine.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                    }
-                }
-                else if(type.get(count) == 2)
-                {
-                     temp = new Brush(Brush.BrushType.HIGHLIGHTER, linesize);//doing the same here-shafiul
-                     for (int i = 1; i < currentLine.size(); i++) {
-                        Point currentPoint = currentLine.get(i);
-                        Point prevPoint = currentLine.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                    }
-                }
-                else if(type.get(count) == 3)
-                {
-                     temp = new Brush(Brush.BrushType.MARKER, linesize);//doing the same here-shafiul
-                     for (int i = 1; i < currentLine.size(); i++) {
-                        Point currentPoint = currentLine.get(i);
-                        Point prevPoint = currentLine.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                    }
-                }
-                else if(type.get(count) == 4)
-                {
-                     temp = new Brush(Brush.BrushType.PENCIL, linesize);//doing the same here-shafiul
-                     for (int i = 1; i < currentLine.size(); i++) {
-                        Point currentPoint = currentLine.get(i);         
-                        Point prevPoint = currentLine.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                    }
-                }
-                else if(type.get(count) == 5)
-                {
-                     temp = new Brush(Brush.BrushType.PEN, linesize);//doing the same here-shafiul
-                     for (int i = 1; i < currentLine.size(); i++) {
-                        Point currentPoint = currentLine.get(i);
-                        Point prevPoint = currentLine.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                    }
-                }
-                else if(type.get(count) == 6)
-                {
-                     temp = new Brush(Brush.BrushType.CRAYON, linesize);//doing the same here-shafiul
-                     for (int i = 1; i < currentLine.size(); i++) {
-                        Point currentPoint = currentLine.get(i);
-                        Point prevPoint = currentLine.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                    }
-                }
-                else if(type.get(count) == 7)
-                {
-                     temp = new Brush(Brush.BrushType.SPRAY_PAINT, 5);//doing the same here-shafiul
-                     for (int i = 1; i < currentLine.size(); i++) {
-                        Point currentPoint = currentLine.get(i);
-                        Point prevPoint = currentLine.get(i-1);
-                        temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                        prevPoint = currentPoint;
-                        
-                    }
-                }
-                
-                count++;
-            }
+        g2d.setColor(clickedColor);
+        g2d.fillRect(20,400,20,20);
+        
+
 
         for (Shape shape : shapes) {
             drawShape(g2d, shape);
@@ -240,18 +161,164 @@ public class DrawingPanel extends JPanel {
         if (currentShape != null) {
             drawShape(g2d, currentShape);
         }
-        
+        g2d.setColor(Color.WHITE);
+        g2d.fillOval(followx-2, followy-2, 2*2,2*2);
 
         g2d.dispose();
     }
+    public void drawCurrent(Graphics2D g2d)
+    {
+        if (currentLine.size() > 1)
+        {
+            int linesize = size.get(size.size()-1);//altered this paints depending on type now -shafiul
+            g2d.setColor(currentColor);
+            Brush temp;
+            
+            switch(latestType)
+                {
+                    case 1:
+                    temp = new Brush(Brush.BrushType.DEFAULT, linesize);
+                    break;
+                    case 2:
+                    temp = new Brush(Brush.BrushType.MARKER, linesize);
+                    break;
+                    case 3:
+                    temp = new Brush(Brush.BrushType.PEN, linesize);
+                    break;
+                    case 4:
+                    temp = new Brush(Brush.BrushType.PENCIL, linesize);
+                    break;
+                    case 5:
+                    temp = new Brush(Brush.BrushType.CRAYON, linesize);
+                    break;
+                    case 6:
+                    temp = new Brush(Brush.BrushType.SPRAY_PAINT, linesize);
+                    break;
+                    case 7:
+                    temp = new Brush(Brush.BrushType.HIGHLIGHTER, linesize);
+                    break;
+                    default:
+                    temp = new Brush(Brush.BrushType.DEFAULT, linesize);
+                    break;
+                }
+                temp.setColor(currentColor);
+                if(latestType==6)
+                {
+                    for (int i = 1; i < currentLine.size(); i++) {
+                        Point currentPoint = currentLine.get(i);
+                        Point prevPoint = currentLine.get(i-1);
+                        if (isWithinScreenBounds(prevPoint) && isWithinScreenBounds(currentPoint))
+                        {
+                            temp.paint(g2d, prevPoint.x, prevPoint.y, 0, 0);
+                        }
+                        prevPoint = currentPoint;
+                    }
+                }
+                else
+                {
+                    for (int i = 1; i < currentLine.size(); i++) {
+                        Point currentPoint = currentLine.get(i);
+                        Point prevPoint = currentLine.get(i-1);
+                        if (isWithinScreenBounds(prevPoint) && isWithinScreenBounds(currentPoint))
+                        {
+                            temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y); //if its the normal brush uses drawLine
+                        }
+                        prevPoint = currentPoint;
+                    }
+                }
+            }
+            
+    }
+    public void drawAll(Graphics2D g2d, int count)
+    {  
+        try
+        {
 
-    public void zoomIn() {
-        scaleFactor *= 1.1; // Increase scale factor for zooming in
-        repaint();
+        for (List<Point> line : scribbleLines) {
+            if (line.size() > 0) {
+                int linesize = size.get(count);
+                g2d.setColor(lineColors.get(line));
+                Brush temp;
+                switch(type.get(count))
+                {
+                    case 1:
+                    temp = new Brush(Brush.BrushType.DEFAULT, linesize);
+                    break;
+                    case 2:
+                    temp = new Brush(Brush.BrushType.MARKER, linesize);
+                    break;
+                    case 3:
+                    temp = new Brush(Brush.BrushType.PEN, linesize);
+                    break;
+                    case 4:
+                    temp = new Brush(Brush.BrushType.PENCIL, linesize);
+                    break;
+                    case 5:
+                    temp = new Brush(Brush.BrushType.CRAYON, linesize);
+                    break;
+                    case 6:
+                    temp = new Brush(Brush.BrushType.SPRAY_PAINT, linesize);
+                    break;
+                    case 7:
+                    temp = new Brush(Brush.BrushType.HIGHLIGHTER,linesize);
+                    break;
+                    default:
+                    temp = new Brush(Brush.BrushType.DEFAULT, linesize);
+                    break;
+                }
+                if(type.get(count)==6)
+                {
+                    for (int i = 1; i < line.size(); i++) {
+                        Point currentPoint = line.get(i);
+                        Point prevPoint = line.get(i-1);
+                        if (isWithinScreenBounds(prevPoint) && isWithinScreenBounds(currentPoint))
+                        {
+                            temp.paint(g2d, prevPoint.x, prevPoint.y, 0, 0);
+                        }
+                        prevPoint = currentPoint;
+                    }
+                }
+                else
+                {
+                    for (int i = 1; i < line.size(); i++) {
+                        Point currentPoint = line.get(i);
+                        Point prevPoint = line.get(i-1);
+                        if (isWithinScreenBounds(prevPoint) && isWithinScreenBounds(currentPoint))
+                        {
+                            temp.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y); //if its the normal brush uses drawLine
+                        }
+                        prevPoint = currentPoint;
+                    }
+                }
+                count++;
+            }
+        }
+    }
+            catch(Exception e)
+            {
+                System.out.println(scribbleLines.size() + " " +type.size()+" "+lineColors.size()+" ");
+            }
     }
 
+    public void zoomIn() {
+        int toolbarWidth = Math.min(getWidth() / 4, 200);
+        int drawingAreaWidth = getWidth() - toolbarWidth; // Exclude the toolbar area from the drawing area
+        scaleFactor *= 1.1; // Increase scale factor for zooming in
+        // Limit zooming to prevent the toolbar area from being affected
+        if (scaleFactor * drawingAreaWidth > drawingAreaWidth) {
+            scaleFactor = (double) drawingAreaWidth / drawingAreaWidth;
+        }
+        repaint();
+    }
+    
     public void zoomOut() {
+        int toolbarWidth = Math.min(getWidth() / 4, 200);
+        int drawingAreaWidth = getWidth() - toolbarWidth; // Exclude the toolbar area from the drawing area
         scaleFactor /= 1.1; // Decrease scale factor for zooming out
+        // Limit zooming to prevent the toolbar area from being affected
+        if (scaleFactor * drawingAreaWidth < drawingAreaWidth) {
+            scaleFactor = (double) drawingAreaWidth / drawingAreaWidth;
+        }
         repaint();
     }
 
@@ -264,18 +331,21 @@ public class DrawingPanel extends JPanel {
     }
     
 
-    public void increaseSize() {
+    public void increaseSize()
+    {
+        //currentBrush.setSize(currentBrush.getSize()+5);
         brushSize+=5;
         System.out.println(brushSize);
-    }
-    public void decreaseSize() {
-        if (brushSize != 0) {
-        brushSize-=5;
-        System.out.println(brushSize);
-        }
 
-        else {
-            brushSize = 0;
+    }
+    public void decreaseSize()
+    {
+        if (brushSize!=0){
+            brushSize-=5;
+            System.out.println(brushSize);
+        }
+        else{
+            brushSize=0;
         }
     }
 
@@ -314,6 +384,7 @@ public class DrawingPanel extends JPanel {
             {
                 if (!scribbleLines.isEmpty()) {
                     undoneLines.add(scribbleLines.remove(scribbleLines.size() - 1)); // Move the undone line to undoneLines
+                    undoSizes.add(size.remove(size.size()-1));
                     repaint();
                 }
             }
@@ -337,7 +408,7 @@ public class DrawingPanel extends JPanel {
             {
                 if (!undoneLines.isEmpty()) {
                     scribbleLines.add(undoneLines.remove(undoneLines.size() - 1)); // Move the undone line back to scribbleLines
-                    size.add(undoSizes.remove(undoSizes.size() - 1));
+                    size.add(undoSizes.remove(undoSizes.size()-1));
                     repaint();
                 }
             }
@@ -352,7 +423,6 @@ public class DrawingPanel extends JPanel {
             undoList.add(redoList.remove(redoList.size()-1));
         }
     }
-
     public void fill(int width, int height, int x, int y) {
         int[][] pixelArray = new int[width][height];
         for (int i = 0; i < width; i++) {
@@ -370,14 +440,11 @@ public class DrawingPanel extends JPanel {
 
         setBackground(currentColor); 
         repaint(); 
-        }
+    }
+    
 
     public void setCurrentColor(Color color) {
         this.currentColor = color;
-    }
-
-    public Color getCurrentColor() {
-        return currentColor;
     }
 
     public void setStrokeWidth(float width) {
@@ -410,6 +477,18 @@ public class DrawingPanel extends JPanel {
         int x2 = shape.getX2();
         int y2 = shape.getY2();
 
+        int toolbarWidth = Math.min(getWidth() / 4, 200);
+        
+        
+        x1 = Math.max(x1, toolbarWidth); 
+        x2 = Math.max(x2, toolbarWidth); 
+        x1 = Math.min(x1, getWidth()); 
+        x2 = Math.min(x2, getWidth());   //adjusting boundaries
+        y1 = Math.max(y1, 0); 
+        y2 = Math.max(y2, 0); 
+        y1 = Math.min(y1, getHeight()); 
+        y2 = Math.min(y2, getHeight()); 
+
         switch (shape.getShape()) {
             case Shape.RECTANGLE:
                 g2d.drawRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
@@ -431,94 +510,186 @@ public class DrawingPanel extends JPanel {
 
     private class DrawingMouseListener extends MouseAdapter {
         @Override
-        public void mousePressed(MouseEvent e) {       
-            if (currentShape != null) {
-                int x = e.getX();
-                int y = e.getY();
-                currentShape = new Shape(x, y, x, y, currentColor, new BasicStroke(currentStrokeWidth), currentShape.getShape());
-                undoList.add("Shape");
-            }
-            else if (textBox != null && textBox.contains(e.getPoint())) {
-                textBoxOffset = new Point(e.getX() - textBox.getX(), e.getY() - textBox.getY());
-            }
-               
-            else if (shouldPerformFill && !fill.isEmpty()) { 
-                shouldPerformFill = false;
-                int[][] pixelArray = new int[getWidth()][getHeight()]; 
-                Color originalColor = new Color(pixelArray[e.getX()][e.getY()]); 
-    
-                // Trigger fill operation
-                fill.get(0).floodFill(pixelArray, e.getX(), e.getY(), originalColor, currentColor);
-                setBackground(currentColor);
-                undoList.add("Fill");
-                repaint();
-            }
-            else {
-                size.add(brushSize);
-                if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT) {
+        public void mousePressed(MouseEvent e) {
+            if (isWithinScreenBounds(e.getPoint())) 
+            {
+                
+                if (currentShape != null) {
+                    int x = e.getX();
+                    int y = e.getY();
+                    currentShape = new Shape(x, y, x, y, currentColor, new BasicStroke(currentStrokeWidth), currentShape.getShape());
+                    undoList.add("Shape");
+                }else if (textBox != null && textBox.contains(e.getPoint())) {
+                    textBoxOffset = new Point(e.getX() - textBox.getX(), e.getY() - textBox.getY());
+                } 
+                else if (shouldPerformFill && !fill.isEmpty()) { 
+                    shouldPerformFill = false;
+                    int[][] pixelArray = new int[getWidth()][getHeight()]; 
+                    Color originalColor = new Color(pixelArray[e.getX()][e.getY()]); 
+        
+                    // Trigger fill operation
+                    fill.get(0).floodFill(pixelArray, e.getX(), e.getY(), originalColor, currentColor);
+                    setBackground(currentColor);
+                    undoList.add("Fill");
+                    repaint();
+                }
+            else{
+                
+                if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT && defaultButton.getStatus()) {
                     type.add(1);
                     currentLine.add(e.getPoint());
                     undoList.add("Pen");
                     currentLine.clear();
+                    size.add(brushSize);
                 }
-                else if (currentBrush.getBrushType() == Brush.BrushType.HIGHLIGHTER){
+                else if (currentBrush.getBrushType() == Brush.BrushType.MARKER && markerButton.getStatus()){
 
                     type.add(2);
                     currentLine.add(e.getPoint());
                     undoList.add("Pen");
                     currentLine.clear();
+                    size.add(brushSize);
 
 
                 }
-                else if (currentBrush.getBrushType() == Brush.BrushType.MARKER){
+                else if (currentBrush.getBrushType() == Brush.BrushType.PEN && penButton.getStatus()){
 
                     type.add(3);
                     currentLine.add(e.getPoint());
                     undoList.add("Pen");
                     currentLine.clear();
+                    size.add(brushSize);
 
 
                 }
-                else if (currentBrush.getBrushType() == Brush.BrushType.PENCIL){
+                else if (currentBrush.getBrushType() == Brush.BrushType.PENCIL && pencilButton.getStatus()){
 
                     type.add(4);
                     currentLine.add(e.getPoint());
                     undoList.add("Pen");
                     currentLine.clear();
+                    size.add(brushSize);
 
 
                 }
-                else if (currentBrush.getBrushType() == Brush.BrushType.PEN){
+                else if (currentBrush.getBrushType() == Brush.BrushType.CRAYON && crayonButton.getStatus()){
 
                     type.add(5);
                     currentLine.add(e.getPoint());
                     undoList.add("Pen");
                     currentLine.clear();
+                    size.add(brushSize);
 
 
                 }
-                else if (currentBrush.getBrushType() == Brush.BrushType.CRAYON){
+                else if (currentBrush.getBrushType() == Brush.BrushType.SPRAY_PAINT && spraypaintButton.getStatus()){
 
                     type.add(6);
                     currentLine.add(e.getPoint());
                     undoList.add("Pen");
                     currentLine.clear();
+                    size.add(brushSize);
 
 
                 }
-                else if (currentBrush.getBrushType() == Brush.BrushType.SPRAY_PAINT){
+                else if (currentBrush.getBrushType() == Brush.BrushType.HIGHLIGHTER && highlighterButton.getStatus()){
 
                     type.add(7);
                     currentLine.add(e.getPoint());
                     undoList.add("Pen");
                     currentLine.clear();
-
-
+                    size.add(brushSize);
                 }
            
                 List<Color> colors = new ArrayList<>();
                 colors.add(currentColor); // Store the initial color
-               
+            }
+            }
+            if(!isWithinScreenBounds(e.getPoint()))
+            { 
+                if (e.getX() >= 20 && e.getX() < 20 + colorSpecturm.getWidth() &&
+                    e.getY() >= 200 && e.getY() < 200 + colorSpecturm.getHeight()) {
+                    // Get the color at the clicked coordinates
+                    int rgb = colorSpecturm.getRGB(e.getX() - 20, e.getY() - 200);
+                    // Extract the individual RGB components
+                    r = (rgb >> 16) & 0xFF;
+                    g = (rgb >> 8) & 0xFF;
+                    b = rgb & 0xFF;
+                    // Create a new color with the extracted RGB components
+                    clickedColor = new Color(r, g, b);
+                    // Set the current drawing color to the clicked color
+                    setCurrentColor(clickedColor);
+                    // Optionally, do something with the clicked color
+                    System.out.println("Clicked color: " + clickedColor);
+                    followx = e.getX();
+                    followy = e.getY();
+                    repaint();
+                }
+                int old = latestType;
+                for(int i=0;i<buttonList.size();i++)//do this shit
+                {
+                       
+                    if(buttonList.get(i).Collision(e.getPoint()))
+                    {
+                        repaint();
+                        buttonList.get(i).Clicked(true);
+                        switch(i)
+                        {
+                            case 0:
+                            setCurrentBrush(new Brush(Brush.BrushType.DEFAULT,brushSize));
+                            
+                            latestType = 1;
+                            break;
+                            case 1:
+                            setCurrentBrush(new Brush(Brush.BrushType.MARKER, brushSize));
+                            latestType = 2;
+                            break;
+                            case 2:
+                            setCurrentBrush(new Brush(Brush.BrushType.PEN, brushSize));
+                            latestType = 3;
+                            break;
+                            case 3:
+                            setCurrentBrush(new Brush(Brush.BrushType.PENCIL, brushSize));
+                            latestType = 4;
+                            break;
+                            case 4:
+                            setCurrentBrush(new Brush(Brush.BrushType.CRAYON, brushSize));
+                            latestType = 5;
+                            break;
+                            case 5:
+                            setCurrentBrush(new Brush(Brush.BrushType.SPRAY_PAINT, brushSize));
+                            latestType = 6;
+                            break;
+                            case 6:
+                            setCurrentBrush(new Brush(Brush.BrushType.HIGHLIGHTER, brushSize));
+                            latestType = 7;
+                            break;
+                            case 7:
+                            latestType = 8;
+                            setCurrentShape(Shape.RECTANGLE);
+                            break;
+                            case 8:
+                            latestType = 9;
+                            setCurrentShape(Shape.OVAL);
+                            break;
+                            case 9:
+                            latestType = 10;
+                            setCurrentShape(Shape.STRAIGHT_LINE);
+                            default:
+                            
+
+                        }
+                    }
+
+                }
+            
+                if(old!=latestType)
+                {
+                    buttonList.get(old-1).Clicked(false);
+                    repaint();
+                }
+
+
             }
         }
     
@@ -526,6 +697,8 @@ public class DrawingPanel extends JPanel {
         @Override
         public void mouseReleased(MouseEvent e) {
             textBoxOffset = null;
+            if(isWithinScreenBounds(e.getPoint()))
+            {
             if (currentShape != null) {
                 int x = e.getX();
                 int y = e.getY();
@@ -534,8 +707,9 @@ public class DrawingPanel extends JPanel {
                 shapes.add(currentShape);
                 currentShape = null;
                 repaint();
-            } else {
-                lineColors.put(new ArrayList<>(currentLine), currentColor);
+            }
+             else {
+                //lineColors.put(new ArrayList<>(currentLine), currentColor);
                 if (currentBrush.getBrushType() == Brush.BrushType.DEFAULT) {
                     scribbleLines.add(new ArrayList<>(currentLine));
                     lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current line
@@ -587,6 +761,7 @@ public class DrawingPanel extends JPanel {
             }
         }
     }
+    }
 
     private class DrawingMouseMotionListener extends MouseMotionAdapter {
         @Override
@@ -624,6 +799,34 @@ public class DrawingPanel extends JPanel {
                     
                 }
             }
-          }
+        }
+        
+        public void mouseMoved(MouseEvent e) {
+            for (int i = 0; i < buttonList.size(); i++) {
+                if (buttonList.get(i).Collision(e.getPoint())) {
+                    // Do something when the mouse is over the button
+                    // For example, change the button color or display a tooltip
+                    // You can also trigger other actions based on the button
+                    System.out.println("Mouse over button " + i);
+                    repaint();
+                }
+            }
+        }
+        
+        }
+        private boolean isWithinScreenBounds(Point point) {
+            int toolbarWidth = Math.min(getWidth() / 4, 200);
+            return point.x >= toolbarWidth && point.x <= getWidth() && point.y >= 0 && point.y <= getHeight();
+        }
+
+        private Color getColorAt(int x, int y) {
+            Robot robot;
+            try {
+                robot = new Robot();
+                return robot.getPixelColor(x, y);
+            } catch (AWTException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
