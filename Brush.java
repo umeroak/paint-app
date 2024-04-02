@@ -55,19 +55,23 @@ public class Brush {
                 g2d.drawLine(x - size / 2, y - size / 2, normalx, normaly);
                 break;
             case MARKER:
-                int markerSize = size * 2;
+                int markerSize = size * 1;
                 g2d.setColor(g2d.getColor());
                 g2d.drawLine(x - markerSize / 2, y - markerSize / 2, normalx, normaly);
+                g2d.setStroke(new BasicStroke(size));
 
                 break;
             case PENCIL:
+            g2d.setStroke(new BasicStroke(size));
                 g2d.setColor(g2d.getColor());
-
-                g2d.drawLine(x, y, x, y);
+                
+                g2d.drawLine(x, y, normalx, normaly);
                 break;
             case PEN:
                 g2d.setColor(g2d.getColor());
+                g2d.setStroke(new BasicStroke(size));
                 g2d.drawLine(x - size / 2, y - size / 2, normalx, normaly);
+              
                 break;
             
             case CRAYON:
@@ -80,11 +84,11 @@ public class Brush {
             
             case SPRAY_PAINT:
                 g2d.setColor(g2d.getColor());
-                Random randomSpray = new Random(FIXED_SEED);
-                int spraySize = size * 8;
+                Random random = new Random();
+                int spraySize = size * 1; 
                 for (int i = 0; i < spraySize; i++) {
-                    int offsetX = randomSpray.nextInt(size * 2) - size;
-                    int offsetY = randomSpray.nextInt(size * 2) - size;
+                    int offsetX = random.nextInt(size * 2) - size;
+                    int offsetY = random.nextInt(size * 2) - size;
                     g2d.fillRect(x + offsetX, y + offsetY, 1, 1);
                 }
                 break;

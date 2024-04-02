@@ -235,7 +235,7 @@ public class MainFrame extends JFrame {
         highlighterMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.HIGHLIGHTER, 15)); // Set the same properties as the transparent brush
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.HIGHLIGHTER, 10)); // Set the same properties as the transparent brush
             }
         });
         highlighterMenu.add(highlighterMenuItem);
@@ -254,7 +254,7 @@ public class MainFrame extends JFrame {
         markerBrushMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.MARKER, 10));
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.MARKER, 8));
             }
         });
         brushMenu.add(markerBrushMenuItem);
@@ -263,7 +263,7 @@ public class MainFrame extends JFrame {
         pencilBrushMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PENCIL, 7));
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PENCIL, 3));
             }
         });
         brushMenu.add(pencilBrushMenuItem);
@@ -272,7 +272,7 @@ public class MainFrame extends JFrame {
         penBrushMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PEN, 10));
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PEN, 5));
             }
         });
         brushMenu.add(penBrushMenuItem);

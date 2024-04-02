@@ -199,6 +199,7 @@ public class DrawingPanel extends JPanel {
     public void drawCurrent(Graphics2D g2d) {//reduce these shits, put panel into seperate file, figure out the monstrosity that is the mouse section, cleaner code =easier to bug fix
         g2d = canvas.createGraphics();
         if (currentLine.size() > 1) {
+            
             if (!eraserMode) {
                 //int linesize = size.get(size.size() - 1);// altered this paints depending on type now -shafiul
                 g2d.setColor(currentColor);
@@ -207,9 +208,21 @@ public class DrawingPanel extends JPanel {
                         Point prevPoint = currentLine.get(i - 1);
                         if (isWithinScreenBounds(prevPoint) && isWithinScreenBounds(currentPoint)) {
                             g2d.setStroke(new BasicStroke(brushSize)); // Set the stroke size
-                            if(latestType == 7)
+                            if(latestType == 2){
+                               currentBrush.setSize(8); //marker
+                            }
+                            else if(latestType == 3){
+                                currentBrush.setSize(5); // pen
+                             }
+                            else if(latestType == 4){
+                                currentBrush.setSize(3); // pencil
+                             }
+                             
+                            
+                           else if(latestType == 7)
                             {
-                                g2d.setColor(new Color(clickedColor.getRed(), clickedColor.getGreen(), clickedColor.getBlue(), 50));
+                                g2d.setColor(new Color(clickedColor.getRed(), clickedColor.getGreen(), clickedColor.getBlue(), 5));
+                                
                             }
                             else
                             {
@@ -468,7 +481,7 @@ public class DrawingPanel extends JPanel {
                         eraserMode = false;
 
                     } else if (currentBrush.getBrushType() == Brush.BrushType.MARKER && markerButton.getStatus()) {
-
+                        
                         type.add(2);
                         currentLine.add(e.getPoint());
                         
@@ -568,15 +581,15 @@ public class DrawingPanel extends JPanel {
                                 latestType = 1;
                                 break;
                             case 1:
-                                setCurrentBrush(new Brush(Brush.BrushType.MARKER, brushSize));
+                                setCurrentBrush(new Brush(Brush.BrushType.MARKER, 8));
                                 latestType = 2;
                                 break;
                             case 2:
-                                setCurrentBrush(new Brush(Brush.BrushType.PEN, brushSize));
+                                setCurrentBrush(new Brush(Brush.BrushType.PEN, 5));
                                 latestType = 3;
                                 break;
                             case 3:
-                                setCurrentBrush(new Brush(Brush.BrushType.PENCIL, brushSize));
+                                setCurrentBrush(new Brush(Brush.BrushType.PENCIL, 3));
                                 latestType = 4;
                                 break;
                             case 4:
@@ -588,7 +601,7 @@ public class DrawingPanel extends JPanel {
                                 latestType = 6;
                                 break;
                             case 6:
-                                setCurrentBrush(new Brush(Brush.BrushType.HIGHLIGHTER, brushSize));
+                                setCurrentBrush(new Brush(Brush.BrushType.HIGHLIGHTER, 10));
                                 latestType = 7;
                                 break;
                             case 7:
@@ -655,7 +668,8 @@ public class DrawingPanel extends JPanel {
                                                                                                                    // here
                         scribbleLines.add(new ArrayList<>(currentLine));
                         lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current
-                                                                                    // line
+                             
+                                                                              // line
                         eraserMode = false;
                         currentLine.clear();
                         repaint();
