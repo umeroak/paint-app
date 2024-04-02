@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+import java.awt.image.BufferedImage;
 
 public class BetterButton implements Serializable, ActionListener {
     private int height;
@@ -12,8 +13,9 @@ public class BetterButton implements Serializable, ActionListener {
     Rectangle rect;
     private boolean collide, clicked;
     private ActionListener actionListener;
+    private BufferedImage icon;
 
-    public BetterButton(int positionx, int positiony, int height, int width )
+    public BetterButton(int positionx, int positiony, int height, int width, BufferedImage icon )
     {
         this.height = height;
         this.width = width;
@@ -22,6 +24,7 @@ public class BetterButton implements Serializable, ActionListener {
         collide = false;
         clicked = false;
         color = Color.BLACK;
+        this.icon = icon;
         rect = new Rectangle(positionx, positiony, height, width);
     }
     public void setColor(Color color)
@@ -40,13 +43,16 @@ public class BetterButton implements Serializable, ActionListener {
 
         // Set the stroke to draw the rectangle outline
         g2d2.setStroke(new BasicStroke(1));
-            g2d.setColor(Color.WHITE);
+            g2d.setColor(Color.BLACK);
             g2d.drawRect(positionx, positiony, height, width);
         }
         
         g2d.setColor(new Color(255, 255, 204, 0));
         //g2d.setColor(color);
         g2d.fillRect(positionx, positiony, height, width);
+        if (icon != null) {
+            g2d.drawImage(icon, positionx, positiony, width, height, null);
+        }
     }
     public void Clicked(boolean status)
     {
