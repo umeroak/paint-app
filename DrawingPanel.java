@@ -258,6 +258,7 @@ public class DrawingPanel extends JPanel {
                                 currentBrush.setSize(brushSize/4);
                                 g2d.setColor(new Color(clickedColor.getRed(), clickedColor.getGreen(), clickedColor.getBlue(), 50));
                             }
+                            
 
                             else
                             {
@@ -265,7 +266,17 @@ public class DrawingPanel extends JPanel {
                             }
                              // Set the color with alpha
                             //g2d.drawLine(prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
-                            currentBrush.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y, texture); // if its the
+                            if(latestType == 5)
+                            {
+                                currentBrush.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y, texture); 
+                                g2d.setColor(new Color(clickedColor.getRed(), clickedColor.getGreen(), clickedColor.getBlue(), 50));
+                                g2d.drawLine(prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y);
+                            }
+                            else
+                            {
+                                currentBrush.paint(g2d, prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y, texture); 
+                            }
+                            // if its the
                         }
                         prevPoint = currentPoint;
                     }
