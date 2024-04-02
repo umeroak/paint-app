@@ -225,12 +225,10 @@ public class DrawingPanel extends JPanel {
         g2d = canvas.createGraphics();
         
         if (currentLine.size() > 1) {
-<<<<<<< HEAD
+
             g2d.setColor(currentColor);
                 currentBrush.setSize(brushSize);
-=======
-            
->>>>>>> d8ca64d48bd71347e668d06a433cc6e9ea7b303a
+
             if (!eraserMode) {
                 //int linesize = size.get(size.size() - 1);// altered this paints depending on type now -shafiul
                 
@@ -734,14 +732,9 @@ public class DrawingPanel extends JPanel {
                                                                                                                    // here
                         scribbleLines.add(new ArrayList<>(currentLine));
                         lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current
-<<<<<<< HEAD
-                                                                                    // line
-                        
-=======
                              
                                                                               // line
                         eraserMode = false;
->>>>>>> d8ca64d48bd71347e668d06a433cc6e9ea7b303a
                         currentLine.clear();
                         repaint();
                     } else if (currentBrush.getBrushType() == Brush.BrushType.PENCIL && pencilButton.getStatus()) {// same
@@ -794,7 +787,6 @@ public class DrawingPanel extends JPanel {
                         size.add(brushSize);
                     }
                     canvasList.add(canvas);
-                    break;
                 }
             }
         }
