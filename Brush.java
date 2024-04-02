@@ -52,6 +52,8 @@ public class Brush {
                 break;
             case HIGHLIGHTER:
                 g2d.setColor(g2d.getColor());
+                //Color highlighterColor = new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(),g2d.getColor().getBlue(), 20);
+                //g2d.setColor(highlighterColor);
                 g2d.drawLine(x - size / 2, y - size / 2, normalx, normaly);
                 break;
             case MARKER:

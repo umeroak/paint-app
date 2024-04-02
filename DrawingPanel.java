@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Queue;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.awt.event.ActionEvent;
@@ -53,13 +55,13 @@ public class DrawingPanel extends JPanel {
     private List<BufferedImage> redoList = new ArrayList<>();
 
     private boolean change = false;
+    private boolean dofill = false;
 
 
     private TexturePaint texture;
 
-    private List<Boolean> eraserList = new ArrayList();
 
-    private boolean firstcase = true;
+
 
     private BufferedImage CrayonIcon, FillBucketIcon, HighLighterIcon, MarkerIcon, OvalIcon, PaintBrushIcon, PenIcon,
             PencilIcon, RectangleIcon, SprayPaintIcon, StraightLineIcon, EraserIcon;
@@ -72,7 +74,7 @@ public class DrawingPanel extends JPanel {
             highlighterButton, rectButton, ovalButton, straightButton, fillButton, eraserButton;
 
     public List<Fill> fill = new ArrayList<>();
-    private boolean shouldPerformFill = false;
+
 
     private BufferedImage canvas;
 
@@ -101,6 +103,7 @@ public class DrawingPanel extends JPanel {
             crayonTexture = ImageIO.read(new File("Crayon.png"));
             // Close the input stream after reading the image
             backgroundImage = ImageIO.read(new File("Icons/background.jpeg"));
+
             
         } catch (IOException e) {
             e.printStackTrace();
@@ -112,6 +115,8 @@ public class DrawingPanel extends JPanel {
     }
 
     public void createButton() {
+
+
         
         defaultButton = new BetterButton(10, 10, 35, 35, PaintBrushIcon);
         markerButton = new BetterButton(50, 10, 35, 35, MarkerIcon);
@@ -143,6 +148,10 @@ public class DrawingPanel extends JPanel {
 
         
     }
+    public void createCanvas()
+    {
+        canvas = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -167,11 +176,12 @@ public class DrawingPanel extends JPanel {
         // Draw existing lines
         //drawAll(g2d, 0);
         if (canvas == null) {
-            canvas = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+            createCanvas();
+            //backgroundImage = canvas;
             canvasList.add(canvas);
             
         }
-        g2d.drawImage(canvasList.get(canvasList.size()-1), 0, 0, null);
+        g2d.drawImage(canvas, 0, 0, null);
         drawCurrent(g2d);
         
         g2d.setColor(new Color(236, 236, 236));
@@ -188,20 +198,38 @@ public class DrawingPanel extends JPanel {
         g2d.setColor(clickedColor);
         g2d.fillRect(20, 400, 20, 20);
 
+        if (currentShape != null) {
+            
+        }
+
         // Draw current shape if any...
-        
+        drawCurrentShape(g2d);
         g2d.setColor(Color.WHITE);
         g2d.fillOval(followx - 2, followy - 2, 2 * 2, 2 * 2);
 
         g2d.dispose();
     }
+    public void drawCurrentShape(Graphics2D g2d)
+    {
+        g2d = canvas.createGraphics();
+        if (currentShape != null) {
+            drawShape(g2d, currentShape);
+            change = false;
+        
+        }
+        g2d.dispose();
+    }//add color to crayon texture
 
     public void drawCurrent(Graphics2D g2d) {//reduce these shits, put panel into seperate file, figure out the monstrosity that is the mouse section, cleaner code =easier to bug fix
+        //createCanvas();
         g2d = canvas.createGraphics();
+        
         if (currentLine.size() > 1) {
+            g2d.setColor(currentColor);
+                currentBrush.setSize(brushSize);
             if (!eraserMode) {
                 //int linesize = size.get(size.size() - 1);// altered this paints depending on type now -shafiul
-                g2d.setColor(currentColor);
+                
                     for (int i = 1; i < currentLine.size(); i++) {
                         Point currentPoint = currentLine.get(i);
                         Point prevPoint = currentLine.get(i - 1);
@@ -211,6 +239,12 @@ public class DrawingPanel extends JPanel {
                             {
                                 g2d.setColor(new Color(clickedColor.getRed(), clickedColor.getGreen(), clickedColor.getBlue(), 50));
                             }
+                            if(latestType == 4)
+                            {
+                                currentBrush.setSize(brushSize/4);
+                                g2d.setColor(new Color(clickedColor.getRed(), clickedColor.getGreen(), clickedColor.getBlue(), 50));
+                            }
+
                             else
                             {
                                 g2d.setColor(new Color(clickedColor.getRed(), clickedColor.getGreen(), clickedColor.getBlue()));
@@ -237,11 +271,7 @@ public class DrawingPanel extends JPanel {
             //canvasList.add(canvas);
             System.out.println(canvasList.size());
         }
-        if (currentShape != null) {
-            drawShape(g2d, currentShape);
-        }
         
-       
         g2d.dispose();
     }
 
@@ -267,14 +297,6 @@ public class DrawingPanel extends JPanel {
             scaleFactor = (double) drawingAreaWidth / drawingAreaWidth;
         }
         repaint();
-    }
-
-    public void setShouldPerformFill(boolean shouldPerformFill) {
-        this.shouldPerformFill = shouldPerformFill;
-    }
-
-    public boolean shouldPerformFill() {
-        return shouldPerformFill;
     }
 
     public void increaseSize() {
@@ -342,23 +364,45 @@ public class DrawingPanel extends JPanel {
         }
     }
 
-    public void fill(int width, int height, int x, int y) {
-        int[][] pixelArray = new int[width][height];
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                pixelArray[i][j] = currentColor.getRGB();
+    public static void floodFillImage(BufferedImage image,int x, int y, Color color) 
+    {
+        int srcColor = image.getRGB(x, y);
+        boolean[][] hits = new boolean[image.getHeight()][image.getWidth()];
+
+        Queue<Point> queue = new LinkedList<Point>();
+        queue.add(new Point(x, y));
+
+        while (!queue.isEmpty()) 
+        {
+            Point p = queue.remove();
+
+            if(floodFillImageDo(image,hits,p.x,p.y, srcColor, color.getRGB()))
+            {     
+                queue.add(new Point(p.x,p.y - 1)); 
+                queue.add(new Point(p.x,p.y + 1)); 
+                queue.add(new Point(p.x - 1,p.y)); 
+                queue.add(new Point(p.x + 1,p.y)); 
             }
         }
+    }
 
-        Color originalColor = new Color(pixelArray[x][y]);
+    private static boolean floodFillImageDo(BufferedImage image, boolean[][] hits,int x, int y, int srcColor, int tgtColor) 
+    {
+        if (y < 0) return false;
+        if (x < 0) return false;
+        if (y > image.getHeight()-1) return false;
+        if (x > image.getWidth()-1) return false;
 
-        fill.add(new Fill());
+        if (hits[y][x]) return false;
 
-        Fill fillInstance = fill.get(fill.size() - 1);
-        fillInstance.floodFill(pixelArray, x, y, originalColor, currentColor);
+        if (image.getRGB(x, y)!=srcColor)
+            return false;
 
-        setBackground(currentColor);
-        repaint();
+        // valid, paint it
+
+        image.setRGB(x, y, tgtColor);
+        hits[y][x] = true;
+        return true;
     }
 
     public void setCurrentColor(Color color) {
@@ -447,14 +491,9 @@ public class DrawingPanel extends JPanel {
                     
                 } else if (textBox != null && textBox.contains(e.getPoint())) {
                     textBoxOffset = new Point(e.getX() - textBox.getX(), e.getY() - textBox.getY());
-                } else if (shouldPerformFill && !fill.isEmpty()) {
-                    shouldPerformFill = false;
-                    int[][] pixelArray = new int[getWidth()][getHeight()];
-                    Color originalColor = new Color(pixelArray[e.getX()][e.getY()]);
-
-                    // Trigger fill operation
-                    fill.get(0).floodFill(pixelArray, e.getX(), e.getY(), originalColor, currentColor);
-                    setBackground(currentColor);
+                } else if (dofill) {
+                    floodFillImage(canvas, e.getX(), e.getY(), clickedColor);
+                    dofill = false;
                     
                     repaint();
                 } else {
@@ -466,6 +505,7 @@ public class DrawingPanel extends JPanel {
                         currentLine.clear();
                         size.add(brushSize);
                         eraserMode = false;
+                        dofill = false;
 
                     } else if (currentBrush.getBrushType() == Brush.BrushType.MARKER && markerButton.getStatus()) {
 
@@ -475,6 +515,7 @@ public class DrawingPanel extends JPanel {
                         currentLine.clear();
                         size.add(brushSize);
                         eraserMode = false;
+                        dofill = false;
 
                     } else if (currentBrush.getBrushType() == Brush.BrushType.PEN && penButton.getStatus()) {
 
@@ -484,6 +525,7 @@ public class DrawingPanel extends JPanel {
                         currentLine.clear();
                         size.add(brushSize);
                         eraserMode = false;
+                        dofill = false;
 
                     } else if (currentBrush.getBrushType() == Brush.BrushType.PENCIL && pencilButton.getStatus()) {
 
@@ -493,6 +535,7 @@ public class DrawingPanel extends JPanel {
                         currentLine.clear();
                         size.add(brushSize);
                         eraserMode = false;
+                        dofill = false;
 
                     } else if (currentBrush.getBrushType() == Brush.BrushType.CRAYON && crayonButton.getStatus()) {
 
@@ -502,6 +545,7 @@ public class DrawingPanel extends JPanel {
                         currentLine.clear();
                         size.add(brushSize);
                         eraserMode = false;
+                        dofill = false;
 
                     } else if (currentBrush.getBrushType() == Brush.BrushType.SPRAY_PAINT
                             && spraypaintButton.getStatus()) {
@@ -512,6 +556,7 @@ public class DrawingPanel extends JPanel {
                         currentLine.clear();
                         size.add(brushSize);
                         eraserMode = false;
+                        dofill = false;
 
                     } else if (currentBrush.getBrushType() == Brush.BrushType.HIGHLIGHTER
                             && highlighterButton.getStatus()) {
@@ -522,7 +567,10 @@ public class DrawingPanel extends JPanel {
                         currentLine.clear();
                         size.add(brushSize);
                         eraserMode = false;
+                        dofill = false;
+                    
                     } else if (eraserButton.getStatus()) {
+                        dofill = false;
                         eraserMode = true;
                         type.add(8);
                         currentLine.add(e.getPoint());
@@ -530,7 +578,16 @@ public class DrawingPanel extends JPanel {
                         currentLine.clear();
                         size.add(brushSize);
                     }
-                    eraserList.add(eraserMode);
+                    else if (fillButton.getStatus()) {
+                        dofill = true;
+                        eraserMode = false;
+                        type.add(8);
+                        currentLine.add(e.getPoint());
+                        
+                        currentLine.clear();
+                        size.add(brushSize);
+                    }
+                    //eraserList.add(eraserMode);
                     List<Color> colors = new ArrayList<>();
                     colors.add(currentColor); // Store the initial color
                 }
@@ -602,10 +659,16 @@ public class DrawingPanel extends JPanel {
                             case 9:
                                 latestType = 10;
                                 setCurrentShape(Shape.STRAIGHT_LINE);
+                                break;
 
                             case 10:
                                 latestType = 11;
                                 eraserMode = true;
+                                break;
+                            case 11:
+                                latestType = 12;
+                                dofill = true;
+                                break;
 
                             default:// fix logic here clean up code too messy
 
@@ -640,7 +703,7 @@ public class DrawingPanel extends JPanel {
                         scribbleLines.add(new ArrayList<>(currentLine));
                         lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current
                                                                                     // line
-                        eraserMode = false;
+                      
                         currentLine.clear();
                         repaint();
                     } else if (currentBrush.getBrushType() == Brush.BrushType.HIGHLIGHTER
@@ -648,7 +711,7 @@ public class DrawingPanel extends JPanel {
                         scribbleLines.add(new ArrayList<>(currentLine));
                         lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current
                                                                                     // line
-                        eraserMode = false;
+                        
                         currentLine.clear();
                         repaint();
                     } else if (currentBrush.getBrushType() == Brush.BrushType.MARKER && markerButton.getStatus()) {// same
@@ -656,7 +719,7 @@ public class DrawingPanel extends JPanel {
                         scribbleLines.add(new ArrayList<>(currentLine));
                         lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current
                                                                                     // line
-                        eraserMode = false;
+                        
                         currentLine.clear();
                         repaint();
                     } else if (currentBrush.getBrushType() == Brush.BrushType.PENCIL && pencilButton.getStatus()) {// same
@@ -664,16 +727,16 @@ public class DrawingPanel extends JPanel {
                         scribbleLines.add(new ArrayList<>(currentLine));
                         lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current
                                                                                     // line
-                        eraserMode = false;
+                       
                         currentLine.clear();
                         repaint();
                     } else if (currentBrush.getBrushType() == Brush.BrushType.PEN && penButton.getStatus()) {// same
                                                                                                              // here
-                        eraserMode = false;
+                        
                         scribbleLines.add(new ArrayList<>(currentLine));
                         lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current
                                                                                     // line
-                        eraserMode = false;
+                        
                         currentLine.clear();
                         repaint();
                     } else if (currentBrush.getBrushType() == Brush.BrushType.CRAYON && crayonButton.getStatus()) {// same
@@ -681,7 +744,7 @@ public class DrawingPanel extends JPanel {
                         scribbleLines.add(new ArrayList<>(currentLine));
                         lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current
                                                                                     // line
-                        eraserMode = false;
+                        
                         currentLine.clear();
                         repaint();
                     } else if (currentBrush.getBrushType() == Brush.BrushType.SPRAY_PAINT
@@ -690,15 +753,23 @@ public class DrawingPanel extends JPanel {
                         lineColors.put(new ArrayList<>(currentLine), currentColor); // Store the color for the current
                                                                                     // line
 
-                        eraserMode = false;
+                        
                         currentLine.clear();
                         repaint();
                     } else if (eraserButton.getStatus()) {
-                        eraserMode = true;
+                        
                         scribbleLines.add(new ArrayList<>(currentLine));
                         lineColors.put(new ArrayList<>(currentLine), currentColor);
                         currentLine.clear();
                         repaint();
+                    }
+                    else if (fillButton.getStatus()) {
+                        
+                        
+                    
+                        
+                        currentLine.clear();
+                        size.add(brushSize);
                     }
                     canvasList.add(canvas);
                 }

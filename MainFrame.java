@@ -64,22 +64,12 @@ public class MainFrame extends JFrame {
         });
 
 
-        JButton fillMenuItem = new JButton("Fill");
-        fillMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setShouldPerformFill(true);  // Set the flag to true
-                drawingPanel.fill.add(new Fill());     
-            }
-        });
-    
+
         buttonPanel.add(increase);
         buttonPanel.add(decrease);
         buttonPanel.add(addTextBoxButton);
         buttonPanel.add(removeTextBoxButton);
-        buttonPanel.add(fillMenuItem);
 
-        
         // Add the buttonPanel to the JFrame's content pane
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
