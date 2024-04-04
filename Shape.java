@@ -5,6 +5,10 @@ public class Shape implements Serializable {
     public static final int RECTANGLE = 0;
     public static final int OVAL = 1;
     public static final int STRAIGHT_LINE = 2;
+    public static final int TRIANGLE = 3;
+    public static final int HEXAGON = 4;
+    public static final int PENTAGON = 5;
+    public static final int OCTAGON = 6;
 
 
     private int x1;

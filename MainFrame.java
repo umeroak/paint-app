@@ -221,6 +221,42 @@ public class MainFrame extends JFrame {
         });
         shapeMenu.add(straightLineMenuItem);
 
+        JMenuItem triangleMenuItem = new JMenuItem("Triangle");
+        triangleMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.TRIANGLE);
+            }
+        });
+        shapeMenu.add(triangleMenuItem);
+        
+        JMenuItem hexagonMenuItem = new JMenuItem("Hexagon");
+        hexagonMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.HEXAGON);
+            }
+        });
+        shapeMenu.add(hexagonMenuItem);
+        
+        JMenuItem pentagonMenuItem = new JMenuItem("Pentagon");
+        pentagonMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.PENTAGON);
+            }
+        });
+        shapeMenu.add(pentagonMenuItem);
+        
+        JMenuItem octagonMenuItem = new JMenuItem("Octagon");
+        octagonMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.OCTAGON);
+            }
+        });
+        shapeMenu.add(octagonMenuItem);
+
         JMenu highlighterMenu = new JMenu("Highlighter");
         JMenuItem highlighterMenuItem = new JMenuItem("Highlighter");
         highlighterMenuItem.addActionListener(new ActionListener() {
