@@ -13,7 +13,8 @@ public class Brush {
         PENCIL,
         PEN,
         CRAYON,
-        SPRAY_PAINT
+        SPRAY_PAINT,
+        ERASER
     }
 
     private BrushType brushType;
@@ -94,6 +95,11 @@ public class Brush {
                     g2d.fillRect(x + offsetX, y + offsetY, 1, 1);
                 }
                 break;
+            case ERASER:
+                g2d.setColor(g2d.getColor());
+                g2d.setStroke(new BasicStroke(size));
+                g2d.drawLine(x, y, normalx, normaly);
+                
             default:
         }
 

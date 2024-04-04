@@ -144,7 +144,8 @@ public class MainFrame extends JFrame {
         undoMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                drawingPanel.undo();
+                
+                //drawingPanel.undo();
             }
         });
         editMenu.add(undoMenuItem);
