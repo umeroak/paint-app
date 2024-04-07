@@ -425,7 +425,7 @@ public class DrawingPanel extends JPanel {
     }
 
     public void decreaseSize() {
-        if (brushSize != 1) {
+        if (brushSize >0) {
             brushSize -= 5;
             System.out.println(brushSize);
         } else {
