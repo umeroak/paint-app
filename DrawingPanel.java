@@ -49,6 +49,7 @@ public class DrawingPanel extends JPanel {
     private double scaleFactor = 1.0; // Scale factor for zooming
     private List<Shape> undoShapes = new ArrayList<>();
 
+
     private boolean dropper = false;
     
     private Brush currentBrush = new Brush(Brush.BrushType.DEFAULT, 10); // Default brush
@@ -91,14 +92,16 @@ public class DrawingPanel extends JPanel {
 
 
     private BufferedImage CrayonIcon, FillBucketIcon, HighLighterIcon, MarkerIcon, OvalIcon, PaintBrushIcon, PenIcon,
-            PencilIcon, RectangleIcon, SprayPaintIcon, StraightLineIcon, EraserIcon, ButtonIcon, RestoreIcon, DropperIcon;
+            PencilIcon, RectangleIcon, SprayPaintIcon, StraightLineIcon, EraserIcon, ButtonIcon, RestoreIcon, DropperIcon,
+            TriangleIcon, HexagonIcon, PentagonIcon, OctagonIcon;
 
     private BufferedImage crayonTexture;
 
     private List<BetterButton> buttonList = new ArrayList<>();
 
     private BetterButton defaultButton, markerButton, pencilButton, penButton, crayonButton, spraypaintButton,
-            highlighterButton, rectButton, ovalButton, straightButton, fillButton, eraserButton, buttonButton, restoreButton, dropperButton;
+            highlighterButton, rectButton, ovalButton, straightButton, fillButton, eraserButton, buttonButton, restoreButton, dropperButton,
+            triangleButton, hexagonButton, pentagonButton, octagonButton;
 
     public List<Fill> fill = new ArrayList<>();
 
@@ -155,6 +158,10 @@ public class DrawingPanel extends JPanel {
             EraserIcon = ImageIO.read(new File("Icons/Eraser.jpg"));
             RestoreIcon = ImageIO.read(new File("Icons/restore.png"));
             DropperIcon = ImageIO.read(new File("Icons/dropper.jpg"));
+            TriangleIcon = ImageIO.read(new File("Icons/triangle.png"));
+            HexagonIcon = ImageIO.read(new File("Icons/hexagon.jpg"));
+            PentagonIcon = ImageIO.read(new File("Icons/pentagon.png"));
+            OctagonIcon = ImageIO.read(new File("Icons/octagon.png"));
 
             crayonTexture = ImageIO.read(new File("Crayon.png"));
 
@@ -171,7 +178,10 @@ public class DrawingPanel extends JPanel {
 
         createButton();
     }
-
+    public int returnBrushSize()
+    {
+        return brushSize;
+    }
     public void createButton() {
 
 
@@ -191,8 +201,10 @@ public class DrawingPanel extends JPanel {
         buttonButton = new BetterButton(10, 130, 35, 35, ButtonIcon);
         restoreButton = new BetterButton(50, 130, 35, 35, RestoreIcon);
         dropperButton = new BetterButton(90, 130, 35, 35, DropperIcon);
-
-
+        triangleButton = new BetterButton(130, 130, 35, 35, TriangleIcon );
+        pentagonButton = new BetterButton(10, 170, 35, 35, PentagonIcon );
+        hexagonButton = new BetterButton(50, 170, 35, 35, HexagonIcon );
+        octagonButton = new BetterButton(90, 170, 35, 35, OctagonIcon );
 
         buttonList.add(defaultButton);
         buttonList.add(markerButton);
@@ -209,6 +221,10 @@ public class DrawingPanel extends JPanel {
         buttonList.add(buttonButton);
         buttonList.add(restoreButton);
         buttonList.add(dropperButton);
+        buttonList.add(triangleButton);
+        buttonList.add(pentagonButton);
+        buttonList.add(hexagonButton);
+        buttonList.add(octagonButton);
 
         latestType = 1;
         buttonList.get(0).Clicked(true);//create brush objects to set, refactor code, lots of unnescary stuff
@@ -273,11 +289,11 @@ public class DrawingPanel extends JPanel {
         }
 
         if (colorSpecturm != null) {
-            g.drawImage(colorSpecturm, 20, 200, null);
+            g.drawImage(colorSpecturm, 20, 250, null);
         }
 
         g2d.setColor(clickedColor);
-        g2d.fillRect(20, 400, 20, 20);
+        g2d.fillRect(20, 450, 20, 20);
 
         if (shapeToggle && mouse) {
             
@@ -298,6 +314,7 @@ public class DrawingPanel extends JPanel {
         g2d.setStroke(new BasicStroke(2.0f));
         g2d.setColor(Color.BLACK);
         g2d.drawLine(toolbarWidth, 0, toolbarWidth, getHeight());
+        g2d.drawLine(getWidth()-2, 0, getWidth()-2, getHeight());
 
         g2d.dispose();
     }
@@ -506,12 +523,12 @@ public class DrawingPanel extends JPanel {
     }
 
     public void decreaseSize() {
-        if (brushSize >0) {
+        if (brushSize >5) {
             brushSize -= 5;
             System.out.println(brushSize);
-            if(brushSize<0)
+            if(brushSize<=0)
             {
-                brushSize = 1;
+                brushSize = 5;
             }
         }
     }
@@ -661,7 +678,15 @@ public class DrawingPanel extends JPanel {
             case Shape.TRIANGLE:
                 int[] xPoints = {x1, (x1 + x2) / 2, x2};
                 int[] yPoints = {y2, y1, y2};
-                g2d.drawPolygon(xPoints, yPoints, 3);
+                if(button)
+                {
+                    g2d.fillPolygon(xPoints, yPoints, 3);
+                }
+                else
+                {
+                    g2d.drawPolygon(xPoints, yPoints, 3);
+                }
+                
                 break;
 
             case Shape.HEXAGON:
@@ -676,7 +701,15 @@ public class DrawingPanel extends JPanel {
                     xHexagon[i] = (int) (xCenter + radius * Math.cos(angle));
                     yHexagon[i] = (int) (yCenter + radius * Math.sin(angle));
                 }
-                g2d.drawPolygon(xHexagon, yHexagon, numSides);
+                
+                if(button)
+                {
+                    g2d.fillPolygon(xHexagon, yHexagon, numSides);
+                }
+                else
+                {
+                    g2d.drawPolygon(xHexagon, yHexagon, numSides);
+                }
                 break;
 
             case Shape.PENTAGON:
@@ -691,7 +724,15 @@ public class DrawingPanel extends JPanel {
                     xPentagon[i] = (int) (xCenter + radius * Math.cos(angle));
                     yPentagon[i] = (int) (yCenter + radius * Math.sin(angle));
                 }
-                g2d.drawPolygon(xPentagon, yPentagon, numSides);
+                if(button)
+                {
+                    g2d.fillPolygon(xPentagon, yPentagon, numSides);
+                }   
+                else
+                {
+                    g2d.drawPolygon(xPentagon, yPentagon, numSides);
+                }
+                
                 break;
 
             case Shape.OCTAGON:
@@ -706,7 +747,15 @@ public class DrawingPanel extends JPanel {
                     xOctagon[i] = (int) (xCenter + radius * Math.cos(angle));
                     yOctagon[i] = (int) (yCenter + radius * Math.sin(angle));
                 }
-                g2d.drawPolygon(xOctagon, yOctagon, numSides);
+                
+                if(button)
+                {
+                    g2d.fillPolygon(xOctagon, yOctagon, numSides);
+                }
+                else
+                {   
+                    g2d.drawPolygon(xOctagon, yOctagon, numSides);
+                }
                 break;
             // Add more shape types if needed...
         }
@@ -1081,6 +1130,39 @@ public class DrawingPanel extends JPanel {
                                 latestType = 15;
                                 dropper = true;
                                 break;
+                            case 15:
+                                latestType = 16;
+                                setCurrentShape(Shape.TRIANGLE);
+                                shape = 3;
+                                shapeToggle = true;
+                                dofill = false;
+                                dropper = false;
+                                break;
+                            case 16:
+                                latestType = 17;
+                                setCurrentShape(Shape.PENTAGON);
+                                shape = 5;
+                                shapeToggle = true;
+                                dofill = false;
+                                dropper = false;
+                                break;
+                            case 17:
+                                latestType = 18;
+                                setCurrentShape(Shape.HEXAGON);
+                                shape = 4;
+                                shapeToggle = true;
+                                dofill = false;
+                                dropper = false;
+                                break;
+                            case 18:
+                                latestType = 19;
+                                setCurrentShape(Shape.OCTAGON);
+                                shape = 6;
+                                shapeToggle = true;
+                                dofill = false;
+                                dropper = false;
+                                break;
+                            
                             default:// fix logic here clean up code too messy
 
                         }
