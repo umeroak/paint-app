@@ -14,6 +14,7 @@ public class BetterButton implements Serializable, ActionListener {
     private boolean collide, clicked;
     private ActionListener actionListener;
     private BufferedImage icon;
+    private String message = "ASASA";
 
     public BetterButton(int positionx, int positiony, int height, int width, BufferedImage icon )
     {

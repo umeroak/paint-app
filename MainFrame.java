@@ -82,30 +82,32 @@ public class MainFrame extends JFrame {
     getContentPane().add(textFieldPanel, BorderLayout.SOUTH);
     }
 
-    private void createButton()
-    {
+    private void createButton() {
         JPanel buttonPanel = new JPanel();
-
+    
         JButton increase = new JButton("INCREASE");
         increase.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 drawingPanel.increaseSize();
+                updateBrushSizeLabel(); // Update brush size label
             }
         });
+    
         JButton decrease = new JButton("DECREASE");
         decrease.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 drawingPanel.decreaseSize();
+                updateBrushSizeLabel(); // Update brush size label
             }
         });
+    
         JButton addTextBoxButton = new JButton("Add Text Box");
         addTextBoxButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Call the method to add a text box to the drawing panel
-                drawingPanel.showTextBox(new Point(100, 100), new Dimension(100, 50)); // Example initial location and size
+                drawingPanel.showTextBox(new Point(100, 100), new Dimension(100, 50));
             }
         });
     
@@ -113,23 +115,37 @@ public class MainFrame extends JFrame {
         removeTextBoxButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Call the method to remove the text box from the drawing panel
                 drawingPanel.hideTextBox();
             }
         });
-
-
-
+    
         buttonPanel.add(increase);
         buttonPanel.add(decrease);
         buttonPanel.add(addTextBoxButton);
         buttonPanel.add(removeTextBoxButton);
-
-        // Add the buttonPanel to the JFrame's content pane
+    
+        JLabel brushSizeLabel = new JLabel("Brush Size: " + drawingPanel.returnBrushSize());
+        buttonPanel.add(brushSizeLabel);
+    
         getContentPane().add(buttonPanel, BorderLayout.NORTH);
-
     }
-
+    
+    // Method to update brush size label
+    private void updateBrushSizeLabel() {
+        Component[] components = getContentPane().getComponents();
+        for (Component component : components) {
+            if (component instanceof JPanel) {
+                JPanel buttonPanel = (JPanel) component;
+                for (Component innerComponent : buttonPanel.getComponents()) {
+                    if (innerComponent instanceof JLabel && ((JLabel) innerComponent).getText().startsWith("Brush Size:")) {
+                        JLabel brushSizeLabel = (JLabel) innerComponent;
+                        brushSizeLabel.setText("Brush Size: " + drawingPanel.returnBrushSize());
+                        return; // Found and updated the brush size label, exit the method
+                    }
+                }
+            }
+        }
+    }
     private void createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
