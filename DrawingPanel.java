@@ -1014,9 +1014,9 @@ public class DrawingPanel extends JPanel {
             if (!isWithinScreenBounds(e.getPoint())) {
                 
                 if (e.getX() >= 20 && e.getX() < 20 + colorSpecturm.getWidth() &&
-                        e.getY() >= 200 && e.getY() < 200 + colorSpecturm.getHeight()) {
+                        e.getY() >= 250 && e.getY() < 250 + colorSpecturm.getHeight()) {
                     // Get the color at the clicked coordinates
-                    int rgb = colorSpecturm.getRGB(e.getX() - 20, e.getY() - 200);
+                    int rgb = colorSpecturm.getRGB(e.getX() - 20, e.getY() - 250);
                     // Extract the individual RGB componentsmouse
                     r = (rgb >> 16) & 0xFF;
                     g = (rgb >> 8) & 0xFF;
