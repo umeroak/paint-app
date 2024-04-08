@@ -442,36 +442,62 @@ public class DrawingPanel extends JPanel {
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
        }
 
-    public void undo() {
-        undone = true;
+       private BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
+        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+        BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+    
+        Graphics2D g2d = outputImage.createGraphics();
+        g2d.drawImage(resultingImage, 0, 0, null);
+        g2d.dispose();
+    
+        return outputImage;
+    }
+    public void captureState() {
+        // Remove "future" states if the current pointer does not point to the last state
+        while (canvasList.size() > pointer + 1) {
+            canvasList.remove(canvasList.size() - 1);
+        }
         
-        if(pointer<0)
-        {
-            pointer=0;
-        }
-        if (pointer > 0 && pointer <= canvasList.size()) {
-            pointer--;
-            System.out.println(pointer);
-            
-             canvas = canvasList.get(pointer);
-             Graphics2D g2 = canvas.createGraphics();
-             g2.drawImage(canvas, 0, 0, null);
-             g2.dispose();
-             repaint();
-        }
+        // Now, capture the current canvas state
+        BufferedImage currentState = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = currentState.createGraphics();
+        g2d.drawImage(canvas, 0, 0, null);
+        g2d.dispose();
+        
+        // Add the captured state to the list and update the pointer
+        canvasList.add(currentState);
+        pointer = canvasList.size() - 1; // Adjust the pointer to the new latest state
     }
     
-    public void redo() {
-        if (pointer > 0 && pointer < canvasList.size() - 1) {
-            pointer++;
-            //canvas = canvasList.get(pointer);
-            canvas = canvasList.get(pointer);
+      
+    public void undo() {
+        if (pointer > 0) { // Ensure there is something to undo
+            pointer--;
+            BufferedImage toRestore = canvasList.get(pointer);
+            
+            // No need to resize during undo since we want to revert to the exact previous state
+            canvas = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = canvas.createGraphics();
-            g2.drawImage(canvas, 0, 0, null);
+            g2.drawImage(toRestore, 0, 0, this);
             g2.dispose();
             repaint();
         }
     }
+    
+    public void redo() {
+        if (pointer < canvasList.size() - 1) { // Ensure there is something to redo
+            pointer++;
+            BufferedImage toRestore = canvasList.get(pointer);
+            
+            // Similarly, redo to the exact state without resizing
+            canvas = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = canvas.createGraphics();
+            g2.drawImage(toRestore, 0, 0, this);
+            g2.dispose();
+            repaint();
+        }
+    }
+    
 
     /*
     public void zoomIn() {
