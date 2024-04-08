@@ -23,8 +23,51 @@ public class MainFrame extends JFrame {
 
         createButton();
         createMenuBar();
+        createRGBTextFields();
 
         setVisible(true);
+    }
+    private void createRGBTextFields() {
+        JPanel textFieldPanel = new JPanel();
+    
+    // Create the text fields for R, G, and B values
+    JTextField redTextField = new JTextField(3); // 3 columns
+    JTextField greenTextField = new JTextField(3); // 3 columns
+    JTextField blueTextField = new JTextField(3); // 3 columns
+    
+    // Label for red text field
+    JLabel redLabel = new JLabel("R:");
+    // Label for green text field
+    JLabel greenLabel = new JLabel("G:");
+    // Label for blue text field
+    JLabel blueLabel = new JLabel("B:");
+    
+    // Add labels and text fields to the panel
+    textFieldPanel.add(redLabel);
+    textFieldPanel.add(redTextField);
+    textFieldPanel.add(greenLabel);
+    textFieldPanel.add(greenTextField);
+    textFieldPanel.add(blueLabel);
+    textFieldPanel.add(blueTextField);
+    
+    // Add submit button
+    JButton submitButton = new JButton("Submit");
+    submitButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // Get values from text fields
+            int red = Integer.parseInt(redTextField.getText());
+            int green = Integer.parseInt(greenTextField.getText());
+            int blue = Integer.parseInt(blueTextField.getText());
+            
+            // Set color in the drawing panel
+            drawingPanel.setCustomColor(red, green, blue);
+        }
+    });
+    textFieldPanel.add(submitButton);
+    
+    // Add the panel to the JFrame's content pane
+    getContentPane().add(textFieldPanel, BorderLayout.SOUTH);
     }
 
     private void createButton()
@@ -71,7 +114,7 @@ public class MainFrame extends JFrame {
         buttonPanel.add(removeTextBoxButton);
 
         // Add the buttonPanel to the JFrame's content pane
-        getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+        getContentPane().add(buttonPanel, BorderLayout.NORTH);
 
     }
 
@@ -131,14 +174,6 @@ public class MainFrame extends JFrame {
         fileMenu.add(quitMenuItem);
  
         JMenu editMenu = new JMenu("Edit");
-        JMenuItem eraserMenuItem = new JMenuItem("Eraser");
-        eraserMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.toggleEraserMode();
-            }
-        });
-        editMenu.add(eraserMenuItem);
 
         JMenuItem undoMenuItem = new JMenuItem("Undo");
         undoMenuItem.addActionListener(new ActionListener() {
@@ -159,25 +194,6 @@ public class MainFrame extends JFrame {
         });
         editMenu.add(redoMenuItem);
 
-        JMenu zoomMenu = new JMenu("Zoom");
-        JMenuItem zoomInMenuItem = new JMenuItem("Zoom In");
-        zoomInMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.zoomIn();
-            }
-        });
-
-        zoomMenu.add(zoomInMenuItem);
-        
-        JMenuItem zoomOutMenuItem = new JMenuItem("Zoom Out");
-        zoomOutMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.zoomOut();
-            }
-        });
-        zoomMenu.add(zoomOutMenuItem);
        
         JMenu colorMenu = new JMenu("Color");
         JMenuItem colorMenuItem = new JMenuItem("Choose Color");
@@ -193,107 +209,13 @@ public class MainFrame extends JFrame {
         colorMenu.add(colorMenuItem);
 
 
-        JMenu shapeMenu = new JMenu("Shape");
-        JMenuItem rectangleMenuItem = new JMenuItem("Rectangle");
-        rectangleMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentShape(Shape.RECTANGLE);
-            }
-        });
-        shapeMenu.add(rectangleMenuItem);
-
-        JMenuItem ovalMenuItem = new JMenuItem("Oval");
-        ovalMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentShape(Shape.OVAL);
-            }
-        });
-        shapeMenu.add(ovalMenuItem);
-
-        JMenuItem straightLineMenuItem = new JMenuItem("Straight Line");
-        straightLineMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentShape(Shape.STRAIGHT_LINE);
-            }
-        });
-        shapeMenu.add(straightLineMenuItem);
-
-        JMenu highlighterMenu = new JMenu("Highlighter");
-        JMenuItem highlighterMenuItem = new JMenuItem("Highlighter");
-        highlighterMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.HIGHLIGHTER, 10)); // Set the same properties as the transparent brush
-            }
-        });
-        highlighterMenu.add(highlighterMenuItem);
-
-        JMenu brushMenu = new JMenu("Brush");
-        JMenuItem normalBrushMenuItem = new JMenuItem("Default");
-        normalBrushMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.DEFAULT, 10));
-            }
-        });
-        brushMenu.add(normalBrushMenuItem);
-
-        JMenuItem markerBrushMenuItem = new JMenuItem("Marker");
-        markerBrushMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.MARKER, 8));
-            }
-        });
-        brushMenu.add(markerBrushMenuItem);
-
-        JMenuItem pencilBrushMenuItem = new JMenuItem("Pencil");
-        pencilBrushMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PENCIL, 3));
-            }
-        });
-        brushMenu.add(pencilBrushMenuItem);
-
-        JMenuItem penBrushMenuItem = new JMenuItem("Pen");
-        penBrushMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PEN, 5));
-            }
-        });
-        brushMenu.add(penBrushMenuItem);
-
-        JMenuItem crayonBrushMenuItem = new JMenuItem("Crayon");
-        crayonBrushMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.CRAYON, 6));
-            }
-        });
-        brushMenu.add(crayonBrushMenuItem);
-
-        JMenuItem sprayPaintBrushMenuItem = new JMenuItem("Spray Paint"); // New brush menu item
-        sprayPaintBrushMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.SPRAY_PAINT, 10)); // Use a default size for spray paint
-            }
-        });
-        brushMenu.add(sprayPaintBrushMenuItem);
+        
 
         // Add more shape options as needed...
-        menuBar.add(zoomMenu);
         menuBar.add(fileMenu);
-        menuBar.add(shapeMenu);
         menuBar.add(colorMenu);
         menuBar.add(editMenu);
-        menuBar.add(brushMenu);
-        menuBar.add(highlighterMenu);
+
         setJMenuBar(menuBar);
     }
     public static void main(String[] args) {

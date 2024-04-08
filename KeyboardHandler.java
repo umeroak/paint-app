@@ -20,7 +20,7 @@ public class KeyboardHandler {
         actionMap.put("undoAction", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //drawingPanel.undo();
+                drawingPanel.undo();
             }
         });
 

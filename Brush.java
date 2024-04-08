@@ -52,11 +52,33 @@ public class Brush {
                 g2d.drawLine(x, y, normalx, normaly);
                 break;
             case HIGHLIGHTER:
-                g2d.setColor(g2d.getColor());
-                //Color highlighterColor = new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(),g2d.getColor().getBlue(), 20);
-                //g2d.setColor(highlighterColor);
-                g2d.drawLine(x - size / 2, y - size / 2, normalx, normaly);
-                break;
+            Color highlighterColor = new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(), g2d.getColor().getBlue(), 20);
+            g2d.setColor(highlighterColor);
+            
+            // Calculate the distance between points
+            double dx = normalx - x;
+            double dy = normaly - y;
+            double distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Determine the number of segments based on distance
+            int numSegments = (int) (distance / (size / 2));
+            if (numSegments < 1) numSegments = 1; // Ensure at least one segment
+            
+            // Calculate the step size for each segment
+            double stepX = dx / numSegments;
+            double stepY = dy / numSegments;
+            
+            // Draw each segment
+            double startX = x;
+            double startY = y;
+            for (int i = 0; i < numSegments; i++) {
+                double endX = startX + stepX;
+                double endY = startY + stepY;
+                g2d.drawLine((int) (startX - size / 2), (int) (startY - size / 2), (int) (endX - size / 2), (int) (endY - size / 2));
+                startX = endX;
+                startY = endY;
+            }
+            break;
             case MARKER:
                 int markerSize = size * 1;
                 g2d.setColor(g2d.getColor());
@@ -86,17 +108,21 @@ public class Brush {
                 break;
             
             case SPRAY_PAINT:
+            
                 g2d.setColor(g2d.getColor());
+ // Choose any seed value you want
+
+// Create a Random object with the fixed seed
                 Random random = new Random();
                 int spraySize = size * 1; 
                 for (int i = 0; i < spraySize; i++) {
                     int offsetX = random.nextInt(size * 2) - size;
                     int offsetY = random.nextInt(size * 2) - size;
-                    g2d.fillRect(x + offsetX, y + offsetY, 1, 1);
+                    g2d.fillOval(x + offsetX, y + offsetY, 1, 1);
                 }
                 break;
             case ERASER:
-                g2d.setColor(g2d.getColor());
+                g2d.setColor(Color.WHITE);
                 g2d.setStroke(new BasicStroke(size));
                 g2d.drawLine(x, y, normalx, normaly);
                 
