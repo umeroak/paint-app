@@ -297,7 +297,7 @@ public class DrawingPanel extends JPanel {
 
         g2d.setStroke(new BasicStroke(2.0f));
         g2d.setColor(Color.BLACK);
-        g2d.drawLine(getWidth() / 4, 0, getWidth() / 4, getHeight());
+        g2d.drawLine(toolbarWidth, 0, toolbarWidth, getHeight());
 
         g2d.dispose();
     }
