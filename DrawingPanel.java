@@ -20,6 +20,10 @@ import java.awt.image.WritableRaster;
 import java.awt.image.ColorModel;
 import java.awt.image.AffineTransformOp;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentAdapter;
+
 
 public class DrawingPanel extends JPanel {
     private ArrayList<TextBox> textBoxes;
@@ -29,6 +33,7 @@ public class DrawingPanel extends JPanel {
     private Brush previouBrush;
 
     private int shape = 0;
+    private BufferedImage offscreenBuffer;
 
     private List<List<Point>> scribbleLines = new ArrayList<>();
     private List<Point> currentLine = new ArrayList<>();
@@ -109,6 +114,30 @@ public class DrawingPanel extends JPanel {
         addMouseMotionListener(new DrawingMouseMotionListener());
         setLayout(null);
         first = true;
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Assuming 'canvas' is the primary drawing buffer being used throughout
+                if (getWidth() > 0 && getHeight() > 0) {
+                    BufferedImage newCanvas = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D g2d = newCanvas.createGraphics();
+                    
+                    // Preserve the existing drawing by painting it onto the resized canvas
+                    if (canvas != null) {
+                        g2d.drawImage(canvas, 0, 0, null);
+                    }
+                    g2d.dispose();
+                    
+                    // Update the reference to the resized canvas
+                    canvas = newCanvas;
+                    
+                    // It might be necessary to update offscreenBuffer as well
+                    offscreenBuffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+                    
+                    repaint();
+                }
+            }
+        });
         
         try {
             colorSpecturm = ImageIO.read(new File("Icons/Color.png"));
@@ -204,6 +233,11 @@ public class DrawingPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setStroke(new BasicStroke(currentStrokeWidth)); // Set current stroke width
+        int panelWidth = getWidth();
+        int panelHeight = getHeight();
+
+        g2d.drawRect(0, 0, panelWidth - 1, panelHeight - 1);
+
 
         // Apply zoom
         //g2d.scale(scaleFactor, scaleFactor);
@@ -858,9 +892,7 @@ public class DrawingPanel extends JPanel {
                         dofill = false;
                         restoreMode = true;
                         type.add(9);
-                        
-                        
-                        
+                         
                         currentLine.clear();
 
                         currentLine.add(e.getPoint());
@@ -875,10 +907,7 @@ public class DrawingPanel extends JPanel {
                         restoreMode = false;
                         type.add(10);
                         
-                        
-                        
                         currentLine.clear();
-
 
                         // Get the color at the clicked coordinates
                         int rgb = canvas.getRGB(e.getX() , e.getY() );
@@ -1242,6 +1271,8 @@ public class DrawingPanel extends JPanel {
         }
 
     }
+
+
 
     private boolean isWithinScreenBounds(Point point) {
         int toolbarWidth = Math.min(getWidth() / 4, 200);

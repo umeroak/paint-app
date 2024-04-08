@@ -6,6 +6,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
 
 public class MainFrame extends JFrame {
     private DrawingPanel drawingPanel;
@@ -16,10 +19,19 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600); // Set default size
         setLocationRelativeTo(null); // Center the frame
+        
 
         drawingPanel = new DrawingPanel();
         getContentPane().add(drawingPanel);
         new KeyboardHandler(drawingPanel);
+        drawingPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                drawingPanel.repaint(); // Ensure the drawing area is refreshed upon resizing
+            }
+        });
+
 
         createButton();
         createMenuBar();
@@ -209,9 +221,7 @@ public class MainFrame extends JFrame {
         colorMenu.add(colorMenuItem);
 
 
-<<<<<<< HEAD
-        
-=======
+
         JMenu shapeMenu = new JMenu("Shape");
         JMenuItem rectangleMenuItem = new JMenuItem("Rectangle");
         rectangleMenuItem.addActionListener(new ActionListener() {
@@ -340,7 +350,7 @@ public class MainFrame extends JFrame {
             }
         });
         brushMenu.add(sprayPaintBrushMenuItem);
->>>>>>> e295b2414c9e47355db77b3141d2e8c49b484570
+
 
         // Add more shape options as needed...
         menuBar.add(fileMenu);
