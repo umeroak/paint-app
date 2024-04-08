@@ -472,8 +472,7 @@ public class DrawingPanel extends JPanel {
     }
 
     public void decreaseSize() {
-
-        if (brushSize >0) {
+        if (brushSize != 1) {
             brushSize -= 5;
             System.out.println(brushSize);
             if(brushSize<0)
@@ -624,9 +623,61 @@ public class DrawingPanel extends JPanel {
             case Shape.STRAIGHT_LINE:
                 g2d.drawLine(x1, y1, x2, y2);
                 break;
+
+            case Shape.TRIANGLE:
+                int[] xPoints = {x1, (x1 + x2) / 2, x2};
+                int[] yPoints = {y2, y1, y2};
+                g2d.drawPolygon(xPoints, yPoints, 3);
+                break;
+
+            case Shape.HEXAGON:
+                int xCenter = (x1 + x2) / 2;
+                int yCenter = (y1 + y2) / 2;
+                int radius = Math.abs(x2 - x1) / 2;
+                int numSides = 6;
+                int[] xHexagon = new int[numSides];
+                int[] yHexagon = new int[numSides];
+                for (int i = 0; i < numSides; i++) {
+                    double angle = 2 * Math.PI / numSides * i;
+                    xHexagon[i] = (int) (xCenter + radius * Math.cos(angle));
+                    yHexagon[i] = (int) (yCenter + radius * Math.sin(angle));
+                }
+                g2d.drawPolygon(xHexagon, yHexagon, numSides);
+                break;
+
+            case Shape.PENTAGON:
+                xCenter = (x1 + x2) / 2;
+                yCenter = (y1 + y2) / 2;
+                radius = Math.abs(x2 - x1) / 2;
+                numSides = 5;
+                int[] xPentagon = new int[numSides];
+                int[] yPentagon = new int[numSides];
+                for (int i = 0; i < numSides; i++) {
+                    double angle = 2 * Math.PI / numSides * (i - 0.5);
+                    xPentagon[i] = (int) (xCenter + radius * Math.cos(angle));
+                    yPentagon[i] = (int) (yCenter + radius * Math.sin(angle));
+                }
+                g2d.drawPolygon(xPentagon, yPentagon, numSides);
+                break;
+
+            case Shape.OCTAGON:
+                xCenter = (x1 + x2) / 2;
+                yCenter = (y1 + y2) / 2;
+                radius = Math.abs(x2 - x1) / 2;
+                numSides = 8;
+                int[] xOctagon = new int[numSides];
+                int[] yOctagon = new int[numSides];
+                for (int i = 0; i < numSides; i++) {
+                    double angle = 2 * Math.PI / numSides * i;
+                    xOctagon[i] = (int) (xCenter + radius * Math.cos(angle));
+                    yOctagon[i] = (int) (yCenter + radius * Math.sin(angle));
+                }
+                g2d.drawPolygon(xOctagon, yOctagon, numSides);
+                break;
             // Add more shape types if needed...
         }
     }
+          
 
     public void setCurrentShape(int shapeType) {
         currentShape = new Shape(0, 0, 0, 0, Color.BLACK, new BasicStroke(2.0f), shapeType);

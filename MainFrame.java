@@ -209,7 +209,138 @@ public class MainFrame extends JFrame {
         colorMenu.add(colorMenuItem);
 
 
+<<<<<<< HEAD
         
+=======
+        JMenu shapeMenu = new JMenu("Shape");
+        JMenuItem rectangleMenuItem = new JMenuItem("Rectangle");
+        rectangleMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.RECTANGLE);
+            }
+        });
+        shapeMenu.add(rectangleMenuItem);
+
+        JMenuItem ovalMenuItem = new JMenuItem("Oval");
+        ovalMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.OVAL);
+            }
+        });
+        shapeMenu.add(ovalMenuItem);
+
+        JMenuItem straightLineMenuItem = new JMenuItem("Straight Line");
+        straightLineMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.STRAIGHT_LINE);
+            }
+        });
+        shapeMenu.add(straightLineMenuItem);
+
+        JMenuItem triangleMenuItem = new JMenuItem("Triangle");
+        triangleMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.TRIANGLE);
+            }
+        });
+        shapeMenu.add(triangleMenuItem);
+        
+        JMenuItem hexagonMenuItem = new JMenuItem("Hexagon");
+        hexagonMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.HEXAGON);
+            }
+        });
+        shapeMenu.add(hexagonMenuItem);
+        
+        JMenuItem pentagonMenuItem = new JMenuItem("Pentagon");
+        pentagonMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.PENTAGON);
+            }
+        });
+        shapeMenu.add(pentagonMenuItem);
+        
+        JMenuItem octagonMenuItem = new JMenuItem("Octagon");
+        octagonMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentShape(Shape.OCTAGON);
+            }
+        });
+        shapeMenu.add(octagonMenuItem);
+
+        JMenu highlighterMenu = new JMenu("Highlighter");
+        JMenuItem highlighterMenuItem = new JMenuItem("Highlighter");
+        highlighterMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.HIGHLIGHTER, 10)); // Set the same properties as the transparent brush
+            }
+        });
+        highlighterMenu.add(highlighterMenuItem);
+
+        JMenu brushMenu = new JMenu("Brush");
+        JMenuItem normalBrushMenuItem = new JMenuItem("Default");
+        normalBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.DEFAULT, 10));
+            }
+        });
+        brushMenu.add(normalBrushMenuItem);
+
+        JMenuItem markerBrushMenuItem = new JMenuItem("Marker");
+        markerBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.MARKER, 8));
+            }
+        });
+        brushMenu.add(markerBrushMenuItem);
+
+        JMenuItem pencilBrushMenuItem = new JMenuItem("Pencil");
+        pencilBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PENCIL, 3));
+            }
+        });
+        brushMenu.add(pencilBrushMenuItem);
+
+        JMenuItem penBrushMenuItem = new JMenuItem("Pen");
+        penBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.PEN, 5));
+            }
+        });
+        brushMenu.add(penBrushMenuItem);
+
+        JMenuItem crayonBrushMenuItem = new JMenuItem("Crayon");
+        crayonBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.CRAYON, 6));
+            }
+        });
+        brushMenu.add(crayonBrushMenuItem);
+
+        JMenuItem sprayPaintBrushMenuItem = new JMenuItem("Spray Paint"); // New brush menu item
+        sprayPaintBrushMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                drawingPanel.setCurrentBrush(new Brush(Brush.BrushType.SPRAY_PAINT, 10)); // Use a default size for spray paint
+            }
+        });
+        brushMenu.add(sprayPaintBrushMenuItem);
+>>>>>>> e295b2414c9e47355db77b3141d2e8c49b484570
 
         // Add more shape options as needed...
         menuBar.add(fileMenu);
